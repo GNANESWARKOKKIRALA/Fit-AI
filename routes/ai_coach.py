@@ -171,7 +171,7 @@ def chat_send():
         return jsonify({'success': False, 'message': 'Failed to get AI response.'}), 500
 
     # Persist both messages
-    now = datetime.utcnow().isoformat()
+    now = datetime.utcnow()
     db.execute(
         "INSERT INTO chat_history (user_id, role, message, created_at) VALUES (?, ?, ?, ?)",
         (user_id, 'user', user_message, now),
