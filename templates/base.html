@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FitAI - AI-Powered Fitness Coach & Health Analytics Platform">
+    <title>{% block title %}FitAI{% endblock %} | FitAI - AI Fitness Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="FitAI" width="40" height="40">
+                <span class="text-gradient" style="font-size:24px;font-weight:700;">FitAI</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a href="{{ url_for('profile.profile') }}" class="nav-item {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
+                    <span class="nav-icon">👤</span> Profile
+                </a>
+                <a href="{{ url_for('tracking.tracking') }}" class="nav-item {% if request.endpoint and 'tracking' in request.endpoint %}active{% endif %}">
+                    <span class="nav-icon">📈</span> Tracking
+                </a>
+                <a href="{{ url_for('ai_coach.coach') }}" class="nav-item {% if request.endpoint == 'ai_coach.coach' %}active{% endif %}">
+                    <span class="nav-icon">🤖</span> AI Coach
+                </a>
+                <a href="{{ url_for('ai_coach.chat') }}" class="nav-item {% if request.endpoint == 'ai_coach.chat' %}active{% endif %}">
+                    <span class="nav-icon">💬</span> AI Chat
+                </a>
+                <a href="{{ url_for('analytics.analytics') }}" class="nav-item {% if request.endpoint and 'analytics' in request.endpoint %}active{% endif %}">
+                    <span class="nav-icon">🔬</span> Analytics
+                </a>
+                <a href="{{ url_for('export.export_page') }}" class="nav-item {% if request.endpoint and 'export' in request.endpoint %}active{% endif %}">
+                    <span class="nav-icon">📥</span> Export
+                </a>
+            </nav>
+            <div style="padding:16px;border-top:1px solid var(--glass-border);">
+                <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:var(--accent-danger);">
+                    <span class="nav-icon">🚪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <!-- Sidebar overlay for mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Mobile toggle -->
+            <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

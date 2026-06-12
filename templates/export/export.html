@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Export Data{% endblock %}
+
+{% block content %}
+<div class="topbar animate-on-scroll">
+    <div>
+        <h1 class="page-title">Export Fitness Data</h1>
+        <p class="page-subtitle">Download your complete logs, history, and analytics reports in open formats</p>
+    </div>
+</div>
+
+<div class="dashboard-grid animate-on-scroll" style="grid-template-columns: 1fr; gap: 24px;">
+    <!-- Comprehensive Report Card -->
+    <div class="glass-card d-flex flex-column flex-md-row justify-between align-center p-4 gap-4" style="border-left: 4px solid var(--accent-primary);">
+        <div style="flex: 1;">
+            <div class="d-flex align-center gap-3 mb-2">
+                <span style="font-size: 32px;">📄</span>
+                <h2 class="section-title" style="font-size: 20px; margin: 0;">Comprehensive Fitness Diagnostic Report</h2>
+            </div>
+            <p class="text-secondary" style="font-size: 14px; max-width: 600px;">
+                Download a clean, formatted text file containing your profile specifications, daily metrics, weekly summary averages, habit consistency metrics, and AI forecast trends. Ideal for sharing with personal trainers or medical professionals.
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('export.export_report') }}" class="btn-primary" style="display: inline-block; text-align: center; text-decoration: none;">📥 Download Report</a>
+        </div>
+    </div>
+
+    <!-- CSV Datasets Section -->
+    <div class="glass-card">
+        <h2 class="section-title mb-3" style="font-size: 18px;">Download Raw Log Datasets</h2>
+        <p class="text-secondary mb-4" style="font-size: 14px;">Select a specific category below to download a spreadsheet-friendly CSV containing your entire historical records.</p>
+        
+        <div class="export-grid">
+            <!-- Weight CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">⚖️</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Weight Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Weight history timeline</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='weight') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+
+            <!-- Calories CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🔥</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Calorie Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Meal details & counts</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='calories') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+
+            <!-- Water CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">💧</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Hydration Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Daily water volume history</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='water') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+
+            <!-- Sleep CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🌅</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Sleep Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Sleep hours & quality metrics</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='sleep') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+
+            <!-- Workouts CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🏋️</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Workout Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Exercises details & duration</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='workouts') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+
+            <!-- Steps CSV -->
+            <div class="export-card d-flex flex-column justify-between align-center">
+                <div class="mb-3">
+                    <div style="font-size: 40px; margin-bottom: 12px;">🚶</div>
+                    <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Step Logs</h3>
+                    <p class="text-secondary mt-1" style="font-size: 12px;">Daily step count details</p>
+                </div>
+                <a href="{{ url_for('export.export_csv', data_type='steps') }}" class="btn-secondary w-100" style="padding: 10px; text-align: center; text-decoration: none; display: block; font-size: 13px;">Download CSV</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

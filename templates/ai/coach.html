@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% block title %}AI Coach{% endblock %}
+
+{% block content %}
+<div class="topbar animate-on-scroll">
+    <div>
+        <h1 class="page-title">AI Fitness Coach</h1>
+        <p class="page-subtitle">Personalised, AI-generated training plans, diets, and programs powered by Llama 3.3</p>
+    </div>
+</div>
+
+<div class="dashboard-grid animate-on-scroll" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+    <!-- Generator Controls -->
+    <div class="d-flex flex-column gap-4">
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="tab-workouts">🏋️ Workouts</button>
+            <button class="tab-btn" data-tab="tab-diets">🍎 Nutrition</button>
+            <button class="tab-btn" data-tab="tab-programs">📅 Programs</button>
+        </div>
+
+        <!-- Tab 1: Workout Generator -->
+        <div class="tab-content active" id="tab-workouts">
+            <div class="glass-card">
+                <h2 class="section-title mb-3">Workout Generator</h2>
+                <p class="text-secondary mb-4" style="font-size: 14px;">Customise a single-session workout session tailored to your profile guidelines.</p>
+                
+                <form id="workout-form" action="{{ url_for('ai_coach.generate_workout') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Workout Focus</label>
+                        <input type="text" name="workout_type" id="workout_type_input" class="form-control" placeholder="e.g. Full Body, Push, Pull, Legs, Chest & Triceps..." required>
+                        <div class="d-flex flex-wrap gap-2 mt-2">
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Full Body')">💪 Full Body</button>
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Push Split')">🔴 Push</button>
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Pull Split')">🟢 Pull</button>
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Legs')">🦵 Legs</button>
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Upper / Lower')">⚡ Upper / Lower</button>
+                            <button type="button" class="btn-secondary" style="padding:4px 8px;font-size:11px;border-radius:8px;" onclick="setWorkoutFocus('Chest & Back')">🔥 Chest & Back</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Duration</label>
+                        <select name="duration" class="form-select" required>
+                            <option value="15">15 Minutes (Express)</option>
+                            <option value="30" selected>30 Minutes (Standard)</option>
+                            <option value="45">45 Minutes (Optimised)</option>
+                            <option value="60">60 Minutes (Full Session)</option>
+                            <option value="90">90 Minutes (Endurance / Heavy Lifting)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Available Equipment</label>
+                        <select name="equipment" class="form-select" required>
+                            <option value="bodyweight">Bodyweight Only (No Equipment)</option>
+                            <option value="dumbbells">Dumbbells & Resistance Bands</option>
+                            <option value="gym" selected>Full Gym / Club Equipment</option>
+                            <option value="kettlebell">Kettlebell Only</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-100 mt-2">⚡ Generate Workout Plan</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 2: Nutrition Planner -->
+        <div class="tab-content" id="tab-diets">
+            <div class="glass-card">
+                <h2 class="section-title mb-3">Custom Meal Planner</h2>
+                <p class="text-secondary mb-4" style="font-size: 14px;">Generate a full day plan including snack options and macro breakdowns.</p>
+                
+                <form id="diet-form" action="{{ url_for('ai_coach.generate_diet') }}" method="POST">
+                    <div class="form-group">
+                        <label class="form-label">Dietary Approach</label>
+                        <select name="diet_type" class="form-select" required>
+                            <option value="Balanced" {% if profile and profile.diet_preference == 'Balanced' %}selected{% endif %}>Balanced (Standard Macros)</option>
+                            <option value="High Protein" {% if profile and profile.diet_preference == 'High Protein' %}selected{% endif %}>High Protein (Muscle Growth)</option>
+                            <option value="Vegetarian" {% if profile and profile.diet_preference == 'Vegetarian' %}selected{% endif %}>Vegetarian</option>
+                            <option value="Vegan" {% if profile and profile.diet_preference == 'Vegan' %}selected{% endif %}>Vegan</option>
+                            <option value="Keto / Low Carb" {% if profile and profile.diet_preference == 'Keto' %}selected{% endif %}>Keto / Low Carb</option>
+                            <option value="Mediterranean" {% if profile and profile.diet_preference == 'Mediterranean' %}selected{% endif %}>Mediterranean</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Target Calories (Daily)</label>
+                        <input type="number" name="target_calories" class="form-control" placeholder="e.g. 2000" min="1200" max="6000" value="2000" required>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-100 mt-2">🍎 Generate Meal Plan</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab 3: Multi-Week Programs -->
+        <div class="tab-content" id="tab-programs">
+            <div class="glass-card">
+                <h2 class="section-title mb-3">Structured Training Programs</h2>
+                <p class="text-secondary mb-4" style="font-size: 14px;">Click a card below to launch a comprehensive multi-week training guide.</p>
+                
+                <div class="program-grid" style="grid-template-columns: 1fr; gap: 16px;">
+                    <div class="program-card" data-program="muscle_gain" style="padding: 20px; text-align: left; display: flex; align-items: center; gap: 16px;">
+                        <span class="program-icon" style="font-size: 32px; margin: 0;">💪</span>
+                        <div>
+                            <h3 class="program-title" style="font-size: 16px; margin: 0;">Muscle Hypertrophy</h3>
+                            <p class="text-secondary" style="font-size: 12px; margin-top: 4px;">6-Week progressive mass building guide</p>
+                        </div>
+                    </div>
+
+                    <div class="program-card" data-program="weight_loss" style="padding: 20px; text-align: left; display: flex; align-items: center; gap: 16px;">
+                        <span class="program-icon" style="font-size: 32px; margin: 0;">🔥</span>
+                        <div>
+                            <h3 class="program-title" style="font-size: 16px; margin: 0;">Shred & Tone</h3>
+                            <p class="text-secondary" style="font-size: 12px; margin-top: 4px;">Fat loss cardiotraining program</p>
+                        </div>
+                    </div>
+
+                    <div class="program-card" data-program="home_workout" style="padding: 20px; text-align: left; display: flex; align-items: center; gap: 16px;">
+                        <span class="program-icon" style="font-size: 32px; margin: 0;">🏠</span>
+                        <div>
+                            <h3 class="program-title" style="font-size: 16px; margin: 0;">Bodyweight Mastery</h3>
+                            <p class="text-secondary" style="font-size: 12px; margin-top: 4px;">Zero equipment conditioning routines</p>
+                        </div>
+                    </div>
+
+                    <div class="program-card" data-program="gym_workout" style="padding: 20px; text-align: left; display: flex; align-items: center; gap: 16px;">
+                        <span class="program-icon" style="font-size: 32px; margin: 0;">🏋️</span>
+                        <div>
+                            <h3 class="program-title" style="font-size: 16px; margin: 0;">Full Gym Athletic</h3>
+                            <p class="text-secondary" style="font-size: 12px; margin-top: 4px;">Machine and free weights optimization plan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Output Panel -->
+    <div class="d-flex flex-column h-100">
+        <div class="glass-card ai-result h-100 d-flex flex-column" id="output-container" style="min-height: 480px;">
+            <div class="d-flex justify-between align-center mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
+                <h2 class="section-title" id="output-title" style="font-size: 18px; margin: 0;">Coach Response</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn-ghost" id="btn-copy" style="padding: 6px 12px; font-size: 13px;" disabled>📋 Copy</button>
+                    <button class="btn-ghost" id="btn-print" style="padding: 6px 12px; font-size: 13px;" disabled>🖨️ Print</button>
+                </div>
+            </div>
+            
+            <div id="ai-output" style="flex: 1; font-family: 'Inter', sans-serif; font-size: 15px; color: var(--text-primary); overflow-y: auto;">
+                <div class="text-center text-secondary py-5">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🤖</div>
+                    <h3>Your Coach is Ready</h3>
+                    <p style="font-size: 14px; max-width: 300px; margin: 8px auto 0;">Customise a workout, build a diet plan, or load a training program to begin.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function setWorkoutFocus(val) {
+    const input = document.getElementById('workout_type_input');
+    if (input) {
+        input.value = val;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const aiOutput = document.getElementById('ai-output');
+    const outputTitle = document.getElementById('output-title');
+    const btnCopy = document.getElementById('btn-copy');
+    const btnPrint = document.getElementById('btn-print');
+    
+    let currentRawResponse = "";
+
+    // Copy action
+    btnCopy.addEventListener('click', () => {
+        if (!currentRawResponse) return;
+        navigator.clipboard.writeText(currentRawResponse).then(() => {
+            window.FitAI.showToast('Copied to clipboard!', 'success');
+        }).catch(() => {
+            window.FitAI.showToast('Failed to copy', 'error');
+        });
+    });
+
+    // Print action
+    btnPrint.addEventListener('click', () => {
+        if (!currentRawResponse) return;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>FitAI Plan</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; color: #1e293b; line-height: 1.6; }
+                    pre { white-space: pre-wrap; font-family: inherit; }
+                    h1 { color: #7C3AED; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+                </style>
+            </head>
+            <body>
+                <h1>FitAI Coach Plan</h1>
+                <pre>${currentRawResponse}</pre>
+                <script>window.print();<\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    });
+
+    const setOutputState = (title, content, success = true) => {
+        outputTitle.textContent = title;
+        if (success) {
+            currentRawResponse = content;
+            // Simple markdown formatter to display nice HTML list items and headers
+            let formatted = content
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                .replace(/^## (.*$)/gim, '<h2 class="mt-4 mb-2 text-gradient" style="font-size: 20px;">$1</h2>')
+                .replace(/^### (.*$)/gim, '<h3 class="mt-3 mb-2" style="font-size: 16px; color: var(--accent-secondary);">$1</h3>')
+                .replace(/^\* (.*$)/gim, '<li>$1</li>')
+                .replace(/^- (.*$)/gim, '<li>$1</li>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.*?)__/g, '<strong>$1</strong>');
+            
+            aiOutput.innerHTML = `<div class="fade-in py-2" style="line-height:1.8;">${formatted}</div>`;
+            btnCopy.disabled = false;
+            btnPrint.disabled = false;
+        } else {
+            currentRawResponse = "";
+            aiOutput.innerHTML = `
+                <div class="text-center text-secondary py-5">
+                    <div style="font-size: 48px; margin-bottom: 16px; color: var(--accent-danger);">⚠️</div>
+                    <h3>Generation Failed</h3>
+                    <p style="font-size: 14px; max-width: 300px; margin: 8px auto 0;">${content}</p>
+                </div>
+            `;
+            btnCopy.disabled = true;
+            btnPrint.disabled = true;
+        }
+    };
+
+    const handleFormSubmit = async (formId, url, title) => {
+        window.FitAI.showLoading('ai-output');
+        btnCopy.disabled = true;
+        btnPrint.disabled = true;
+        
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                },
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                setOutputState(title, data.content);
+            } else {
+                setOutputState(title, data.message || 'An error occurred during generation.', false);
+            }
+        } catch (err) {
+            setOutputState(title, 'Network error. Please check your connection.', false);
+        }
+    };
+
+    // Workout generator Form
+    document.getElementById('workout-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const type = e.target.querySelector('[name="workout_type"]').value;
+        handleFormSubmit('workout-form', e.target.action, `${type} Workout Routine`);
+    });
+
+    // Diet Planner Form
+    document.getElementById('diet-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const type = e.target.querySelector('[name="diet_type"]').value;
+        handleFormSubmit('diet-form', e.target.action, `${type} Daily Meal Plan`);
+    });
+
+    // Training Programs Actions
+    document.querySelectorAll('.program-card').forEach(card => {
+        card.addEventListener('click', async () => {
+            const programType = card.dataset.program;
+            const programTitle = card.querySelector('.program-title').textContent;
+
+            window.FitAI.showLoading('ai-output');
+            btnCopy.disabled = true;
+            btnPrint.disabled = true;
+
+            const formData = new FormData();
+            formData.append('program_type', programType);
+
+            try {
+                const res = await fetch("{{ url_for('ai_coach.get_program') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    setOutputState(programTitle, data.content);
+                } else {
+                    setOutputState(programTitle, data.message || 'An error occurred during generation.', false);
+                }
+            } catch (err) {
+                setOutputState(programTitle, 'Network error. Please check your connection.', false);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

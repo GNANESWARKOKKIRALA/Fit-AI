@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}AI Chat{% endblock %}
+
+{% block content %}
+<div class="topbar animate-on-scroll">
+    <div>
+        <h1 class="page-title">AI Fitness Assistant</h1>
+        <p class="page-subtitle">Ask questions about workouts, nutrition, or wellness. Your coach remembers context.</p>
+    </div>
+</div>
+
+<div class="glass-card animate-on-scroll d-flex flex-column" style="height: calc(100vh - 180px); padding: 0; overflow: hidden; position: relative;">
+    <!-- Chat Header -->
+    <div class="d-flex align-center justify-between p-3" style="background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid var(--glass-border); padding: 16px 24px;">
+        <div class="d-flex align-center gap-3">
+            <div style="font-size: 32px;">🤖</div>
+            <div>
+                <h3 style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Coach FitAI</h3>
+                <span class="badge badge-success" style="font-size: 11px; padding: 2px 8px; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent-success); animation: pulse 1.5s infinite;"></span> Online
+                </span>
+            </div>
+        </div>
+        <div>
+            <button class="btn-ghost" onclick="clearChat()" style="font-size: 13px; padding: 6px 12px;">🧹 Clear History</button>
+        </div>
+    </div>
+
+    <!-- Message Stream -->
+    <div class="chat-messages" id="chat-messages" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+        {% if chat_history %}
+            {% for msg in chat_history %}
+                {% if msg.role == 'user' %}
+                    <div class="message user">{{ msg.content }}</div>
+                {% else %}
+                    <div class="message ai">{{ msg.content }}</div>
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            <!-- Welcome message when history is empty -->
+            <div class="text-center text-secondary py-5 welcome-placeholder" style="margin: auto; max-width: 400px;">
+                <div style="font-size: 64px; margin-bottom: 20px;">👋</div>
+                <h2 style="color: var(--text-primary); font-size: 20px; font-weight: 600; margin-bottom: 8px;">Welcome to FitAI Chat!</h2>
+                <p style="font-size: 14px; line-height: 1.6;">I'm your dedicated health and fitness assistant. Ask me anything, for example:</p>
+                <div class="d-flex flex-column gap-2 mt-4">
+                    <button class="btn-ghost text-left prompt-suggest" onclick="useSuggestion(this)">"How much protein do I need to gain muscle?"</button>
+                    <button class="btn-ghost text-left prompt-suggest" onclick="useSuggestion(this)">"Can you suggest a quick 15-minute home workout?"</button>
+                    <button class="btn-ghost text-left prompt-suggest" onclick="useSuggestion(this)">"What are some low-calorie evening snack options?"</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Input Bar -->
+    <div style="padding: 20px; border-top: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.15);">
+        <div class="chat-input-area" style="display: flex; gap: 12px; align-items: center;">
+            <input type="text" class="chat-input" placeholder="Type a message or ask a fitness question..." style="flex: 1; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 24px; padding: 14px 20px; font-size: 15px; outline: none; transition: var(--transition);">
+            <button class="btn-primary chat-send-btn" style="border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; box-shadow: none;">
+                <span style="font-size: 18px; transform: rotate(-45deg); margin-left: 2px;">➔</span>
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Scroll to bottom on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const stream = document.getElementById('chat-messages');
+        if (stream) {
+            stream.scrollTop = stream.scrollHeight;
+        }
+    });
+
+    // Handle suggested prompts
+    function useSuggestion(element) {
+        const text = element.textContent.replace(/"/g, '').trim();
+        const input = document.querySelector('.chat-input');
+        if (input) {
+            input.value = text;
+            input.focus();
+            
+            // Remove the suggestions if they are still visible
+            const placeholder = document.querySelector('.welcome-placeholder');
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            
+            // Trigger chat send
+            document.querySelector('.chat-send-btn').click();
+        }
+    }
+
+    // Clear history action
+    async function clearChat() {
+        if (!confirm("Are you sure you want to clear your conversation history? This cannot be undone.")) return;
+        
+        try {
+            const res = await fetch("{{ url_for('ai_coach.chat_clear') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            });
+            // Just reload to see clean chat
+            window.location.reload();
+        } catch {
+            window.FitAI.showToast('Failed to clear chat.', 'error');
+        }
+    }
+</script>
+{% endblock %}

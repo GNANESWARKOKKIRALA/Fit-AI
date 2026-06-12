@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your FitAI account - Start your AI-powered fitness journey">
+    <title>Create Account | FitAI - AI Fitness Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="auth-container">
+        <!-- Animated background orbs -->
+        <div class="orb" style="position:absolute;top:10%;left:15%;width:300px;height:300px;background:radial-gradient(circle,rgba(99,102,241,0.3),transparent 70%);border-radius:50%;filter:blur(60px);animation:float 8s ease-in-out infinite;"></div>
+        <div class="orb" style="position:absolute;bottom:10%;right:15%;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,0.25),transparent 70%);border-radius:50%;filter:blur(80px);animation:float 10s ease-in-out infinite reverse;"></div>
+
+        <div class="auth-card auth-split-card fade-in">
+            <!-- Left Side: Brand & Graphics Illustration -->
+            <div class="auth-illustration-side">
+                <div style="margin-bottom: 16px;">
+                    <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="FitAI" width="55" height="55" style="margin-bottom: 4px; filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.5));">
+                    <h1 style="font-size: 32px; font-weight: 800; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; line-height: 1.2;">FitAI</h1>
+                    <p style="font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; font-weight: 600;">AI Fitness Coach & Analytics</p>
+                </div>
+                
+                <img src="{{ url_for('static', filename='images/gnaneswar_logo_edited.png') }}?v=1.3" alt="Gnaneswar Logo" class="illustration-img">
+                
+                <div class="feature-tags" style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 12px;">
+                    <span class="badge" style="background: rgba(124,58,237,0.12); color: var(--accent-primary); border: 1px solid rgba(124,58,237,0.25); font-size: 11px; padding: 6px 12px; border-radius: 20px; font-weight:600;">🤖 Personal AI Coach</span>
+                    <span class="badge" style="background: rgba(6,182,212,0.12); color: var(--accent-secondary); border: 1px solid rgba(6,182,212,0.25); font-size: 11px; padding: 6px 12px; border-radius: 20px; font-weight:600;">📊 Health Analytics</span>
+                    <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--accent-success); border: 1px solid rgba(16,185,129,0.25); font-size: 11px; padding: 6px 12px; border-radius: 20px; font-weight:600;">🔮 Goal Forecasts</span>
+                </div>
+            </div>
+
+            <!-- Right Side: Forms -->
+            <div class="auth-form-side" style="width: 100%;">
+                <!-- Flash messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}" style="margin-bottom:16px;">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <h2 class="auth-title text-gradient" style="font-size: 26px; margin-bottom: 8px; text-align: left; font-weight:700;">Create Account</h2>
+                <p class="auth-subtitle" style="margin-bottom: 24px; text-align: left;">Start your AI-powered fitness journey</p>
+
+                <form method="POST" action="{{ url_for('auth.register') }}">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required autofocus autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="Create a password" required autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password" class="form-label">Confirm Password</label>
+                        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm your password" required autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="width:100%;margin-top:8px;">
+                        Create Account
+                    </button>
+                </form>
+
+                <p style="text-align:center;margin-top:24px;color:var(--text-secondary);font-size:14px;">
+                    Already have an account?
+                    <a href="{{ url_for('auth.login') }}" style="color:var(--accent-primary);text-decoration:none;font-weight:600;">Log In</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .auth-split-card {
+            max-width: 900px !important;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            padding: 32px;
+        }
+        
+        @media (min-width: 768px) {
+            .auth-split-card {
+                grid-template-columns: 1.15fr 0.85fr;
+                padding: 48px;
+                align-items: center;
+                gap: 48px;
+            }
+            .auth-illustration-side {
+                border-right: 1px solid var(--glass-border);
+                padding-right: 48px;
+            }
+        }
+        
+        .auth-illustration-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        
+        @media (max-width: 767px) {
+            .auth-illustration-side {
+                border-bottom: 1px solid var(--glass-border);
+                padding-bottom: 32px;
+                margin-bottom: 8px;
+            }
+        }
+
+        .illustration-img {
+            width: 100%;
+            max-width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 50%;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 16px 0;
+            animation: floatImg 6s ease-in-out infinite;
+        }
+
+        @keyframes floatImg {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.03); }
+        }
+    </style>
+</body>
+</html>

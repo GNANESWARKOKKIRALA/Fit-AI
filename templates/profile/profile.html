@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1 class="page-title">Fitness Profile</h1>
+        <p class="page-subtitle">Manage your profile and fitness goals</p>
+    </div>
+</div>
+
+<div class="profile-grid">
+    <!-- Profile Form -->
+    <div class="glass-card">
+        <div class="section-header">
+            <h2 class="section-title">Your Information</h2>
+        </div>
+        <form method="POST" action="{{ url_for('profile.profile') }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Age</label>
+                    <input type="number" name="age" class="form-control" placeholder="Enter age" min="10" max="120"
+                           value="{{ profile.age if profile and profile.age else '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-select">
+                        <option value="">Select Gender</option>
+                        <option value="Male" {{ 'selected' if profile and profile.gender == 'Male' }}>Male</option>
+                        <option value="Female" {{ 'selected' if profile and profile.gender == 'Female' }}>Female</option>
+                        <option value="Other" {{ 'selected' if profile and profile.gender == 'Other' }}>Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Height (cm)</label>
+                    <input type="number" name="height" class="form-control" placeholder="e.g. 175" step="0.1"
+                           value="{{ profile.height if profile and profile.height else '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" name="weight" class="form-control" placeholder="e.g. 70" step="0.1"
+                           value="{{ profile.weight if profile and profile.weight else '' }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Goal Weight (kg)</label>
+                    <input type="number" name="goal_weight" class="form-control" placeholder="e.g. 65" step="0.1"
+                           value="{{ profile.goal_weight if profile and profile.goal_weight else '' }}">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Activity Level</label>
+                    <select name="activity_level" class="form-select">
+                        <option value="">Select Level</option>
+                        {% for level in ['Sedentary', 'Light', 'Moderate', 'Active', 'Very Active'] %}
+                        <option value="{{ level }}" {{ 'selected' if profile and profile.activity_level == level }}>{{ level }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Fitness Goal</label>
+                    <select name="fitness_goal" class="form-select">
+                        <option value="">Select Goal</option>
+                        {% for goal in ['Weight Loss', 'Muscle Gain', 'Endurance', 'Flexibility', 'General Fitness'] %}
+                        <option value="{{ goal }}" {{ 'selected' if profile and profile.fitness_goal == goal }}>{{ goal }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Workout Preference</label>
+                    <select name="workout_preference" class="form-select">
+                        <option value="">Select Preference</option>
+                        {% for pref in ['Home', 'Gym', 'Outdoor', 'Mixed'] %}
+                        <option value="{{ pref }}" {{ 'selected' if profile and profile.workout_preference == pref }}>{{ pref }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Diet Preference</label>
+                <select name="diet_preference" class="form-select">
+                    <option value="">No Preference</option>
+                    {% for diet in ['Vegetarian', 'Vegan', 'Keto', 'Paleo', 'Mediterranean', 'High Protein'] %}
+                    <option value="{{ diet }}" {{ 'selected' if profile and profile.diet_preference == diet }}>{{ diet }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Medical Notes</label>
+                <textarea name="medical_notes" class="form-control" placeholder="Any allergies, injuries, or conditions...">{{ profile.medical_notes if profile and profile.medical_notes else '' }}</textarea>
+            </div>
+            <button type="submit" class="btn-primary btn-block">💾 Save Profile</button>
+        </form>
+
+        <!-- Change Password Section -->
+        <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--glass-border);">
+            <h3 class="section-title mb-2">Change Password</h3>
+            <form method="POST" action="{{ url_for('auth.change_password') }}">
+                <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" name="old_password" class="form-control" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="new_password" class="form-control" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Confirm New Password</label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-secondary">🔒 Change Password</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goals Panel -->
+    <div>
+        <div class="glass-card mb-3">
+            <div class="section-header">
+                <h2 class="section-title">Your Goals</h2>
+                <button class="btn-primary btn-sm" onclick="document.getElementById('goalForm').classList.toggle('hidden')">+ Add Goal</button>
+            </div>
+
+            <!-- Add Goal Form -->
+            <div id="goalForm" class="hidden" style="margin-bottom:20px;">
+                <form method="POST" action="{{ url_for('profile.goals') }}">
+                    <div class="form-group">
+                        <label class="form-label">Goal Type</label>
+                        <select name="goal_type" class="form-select" required>
+                            <option value="Weight">Weight Target</option>
+                            <option value="Steps">Daily Steps</option>
+                            <option value="Workout Days">Workout Days/Week</option>
+                            <option value="Water Intake">Water Intake (ml)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Value</label>
+                        <input type="number" name="target_value" class="form-control" required step="0.1" placeholder="e.g. 65">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Target Date</label>
+                        <input type="date" name="target_date" class="form-control">
+                    </div>
+                    <button type="submit" class="btn-primary btn-sm btn-block">Create Goal</button>
+                </form>
+            </div>
+
+            <!-- Goals List -->
+            {% if goals %}
+                {% for goal in goals %}
+                <div class="goal-card">
+                    <div class="goal-header">
+                        <span class="goal-type">{{ goal.goal_type }}</span>
+                        <span class="badge {{ 'badge-success' if goal.status == 'completed' else 'badge-primary' }}">
+                            {{ goal.status }}
+                        </span>
+                    </div>
+                    <div class="goal-info">
+                        <span>Progress: {{ goal.current_value or 0 }} / {{ goal.target_value }}</span>
+                        {% if goal.target_date %}
+                        <span>Due: {{ goal.target_date }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: {{ goal.progress }}%"></div>
+                    </div>
+                    <div class="d-flex justify-between mt-1" style="gap:8px;">
+                        <form method="POST" action="{{ url_for('profile.update_goal', goal_id=goal.id) }}" style="flex:1;" class="d-flex gap-1">
+                            <input type="number" name="current_value" class="form-control" step="0.1"
+                                   placeholder="Update progress" value="{{ goal.current_value or '' }}" style="padding:8px 12px;">
+                            <button type="submit" class="btn-success btn-sm">Update</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('profile.delete_goal', goal_id=goal.id) }}">
+                            <button type="submit" class="btn-danger btn-sm" title="Delete">✕</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-muted text-center" style="padding:32px 0;">No goals set yet. Create one above! 🎯</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

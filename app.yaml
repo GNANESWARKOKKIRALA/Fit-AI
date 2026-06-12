@@ -1,0 +1,6 @@
+runtime: python311
+entrypoint: gunicorn -b :$PORT app:app
+
+env_variables:
+  FLASK_ENV: 'production'
+  # Note: Add GROQ_API_KEY and SECRET_KEY in the Google Cloud Console settings

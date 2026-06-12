@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}History{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1 class="page-title">Tracking History</h1>
+        <p class="page-subtitle">View your complete fitness tracking data</p>
+    </div>
+    <a href="{{ url_for('tracking.tracking') }}" class="btn-secondary">← Back to Tracking</a>
+</div>
+
+<div class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-h-weight">⚖️ Weight</button>
+    <button class="tab-btn" data-tab="tab-h-water">💧 Water</button>
+    <button class="tab-btn" data-tab="tab-h-calories">🔥 Calories</button>
+    <button class="tab-btn" data-tab="tab-h-sleep">😴 Sleep</button>
+    <button class="tab-btn" data-tab="tab-h-workout">💪 Workouts</button>
+    <button class="tab-btn" data-tab="tab-h-steps">👣 Steps</button>
+</div>
+
+<!-- Weight History -->
+<div class="tab-content active" id="tab-h-weight">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Weight History</h3>
+        {% if weight_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Weight (kg)</th></tr></thead>
+                <tbody>
+                    {% for e in weight_history|reverse %}<tr><td>{{ (e.logged_at|string)[:10] }}</td><td>{{ e.weight }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No weight entries yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- Water History -->
+<div class="tab-content" id="tab-h-water">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Water Intake History</h3>
+        {% if water_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Amount (ml)</th></tr></thead>
+                <tbody>
+                    {% for e in water_history|reverse %}<tr><td>{{ (e.logged_at|string)[:16] }}</td><td>{{ e.amount_ml }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No water entries yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- Calorie History -->
+<div class="tab-content" id="tab-h-calories">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Calorie History</h3>
+        {% if calorie_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Consumed</th><th>Burned</th><th>Details</th></tr></thead>
+                <tbody>
+                    {% for e in calorie_history|reverse %}<tr><td>{{ (e.logged_at|string)[:10] }}</td><td>{{ e.calories_consumed }}</td><td>{{ e.calories_burned }}</td><td>{{ e.meal_details or '-' }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No calorie entries yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- Sleep History -->
+<div class="tab-content" id="tab-h-sleep">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Sleep History</h3>
+        {% if sleep_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Hours</th><th>Quality</th></tr></thead>
+                <tbody>
+                    {% for e in sleep_history|reverse %}<tr><td>{{ (e.logged_at|string)[:10] }}</td><td>{{ e.sleep_hours }}</td><td>{{ e.sleep_quality }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No sleep entries yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- Workout History -->
+<div class="tab-content" id="tab-h-workout">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Workout History</h3>
+        {% if workout_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Calories</th><th>Exercises</th></tr></thead>
+                <tbody>
+                    {% for e in workout_history|reverse %}<tr><td>{{ (e.logged_at|string)[:10] }}</td><td>{{ e.workout_type }}</td><td>{{ e.duration_minutes }} min</td><td>{{ e.calories_burned }}</td><td>{{ (e.exercises or '-')[:50] }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No workout entries yet.</p>{% endif %}
+    </div>
+</div>
+
+<!-- Steps History -->
+<div class="tab-content" id="tab-h-steps">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Steps History</h3>
+        {% if step_history %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Steps</th></tr></thead>
+                <tbody>
+                    {% for e in step_history|reverse %}<tr><td>{{ (e.logged_at|string)[:10] }}</td><td>{{ e.steps }}</td></tr>{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}<p class="text-muted text-center p-3">No step entries yet.</p>{% endif %}
+    </div>
+</div>
+{% endblock %}

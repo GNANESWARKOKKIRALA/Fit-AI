@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% block title %}Tracking{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1 class="page-title">Daily Tracking</h1>
+        <p class="page-subtitle">Log your daily fitness metrics</p>
+    </div>
+    <a href="{{ url_for('tracking.history') }}" class="btn-secondary">📋 View History</a>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-weight">⚖️ Weight</button>
+    <button class="tab-btn" data-tab="tab-water">💧 Water</button>
+    <button class="tab-btn" data-tab="tab-calories">🔥 Calories</button>
+    <button class="tab-btn" data-tab="tab-sleep">😴 Sleep</button>
+    <button class="tab-btn" data-tab="tab-workout">💪 Workout</button>
+    <button class="tab-btn" data-tab="tab-steps">👣 Steps</button>
+</div>
+
+<!-- Weight Tab -->
+<div class="tab-content active" id="tab-weight">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Weight</h3>
+        <form id="weightForm" class="d-flex gap-2 align-center flex-wrap">
+            <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
+                <input type="number" name="weight" class="form-control" placeholder="Weight (kg)" step="0.1" required>
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'weight', '/tracking/weight')">Log Weight</button>
+        </form>
+    </div>
+
+    {% if weight_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Entries</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Weight (kg)</th></tr></thead>
+                <tbody>
+                    {% for entry in weight_history[-10:]|reverse %}
+                    <tr><td>{{ (entry.logged_at|string)[:10] }}</td><td>{{ entry.weight }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Water Tab -->
+<div class="tab-content" id="tab-water">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Water Intake</h3>
+        <div class="d-flex gap-1 flex-wrap mb-2">
+            <button class="btn-secondary btn-sm" onclick="quickLogWater(250)">+250 ml</button>
+            <button class="btn-secondary btn-sm" onclick="quickLogWater(500)">+500 ml</button>
+            <button class="btn-secondary btn-sm" onclick="quickLogWater(1000)">+1000 ml</button>
+        </div>
+        <form id="waterForm" class="d-flex gap-2 align-center flex-wrap">
+            <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
+                <input type="number" name="amount_ml" class="form-control" placeholder="Custom amount (ml)" step="50" required>
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'water', '/tracking/water')">Log Water</button>
+        </form>
+        {% if today.water_ml %}
+        <div class="mt-2">
+            <div class="d-flex justify-between mb-1">
+                <span class="text-muted">Today's total: {{ today.water_ml }} ml</span>
+                <span class="text-muted">Goal: 2500 ml</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: {{ [today.water_ml / 25, 100]|min }}%"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if water_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Entries</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Amount (ml)</th></tr></thead>
+                <tbody>
+                    {% for entry in water_history[-10:]|reverse %}
+                    <tr><td>{{ (entry.logged_at|string)[:16] }}</td><td>{{ entry.amount_ml }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Calories Tab -->
+<div class="tab-content" id="tab-calories">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Calories</h3>
+        <form id="caloriesForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Consumed (kcal)</label>
+                    <input type="number" name="consumed" class="form-control" placeholder="e.g. 500" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Burned (kcal)</label>
+                    <input type="number" name="burned" class="form-control" placeholder="e.g. 200" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Meal Details</label>
+                <input type="text" name="meal_details" class="form-control" placeholder="e.g. Lunch - Chicken Salad">
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'calories', '/tracking/calories')">Log Calories</button>
+        </form>
+        {% if today.calories_consumed %}
+        <div class="mt-2 d-flex gap-3">
+            <span class="badge badge-primary">Consumed: {{ today.calories_consumed }} kcal</span>
+            <span class="badge badge-info">Burned: {{ today.calories_burned }} kcal</span>
+            <span class="badge {{ 'badge-success' if (today.calories_consumed - today.calories_burned) <= 2000 else 'badge-warning' }}">
+                Net: {{ today.calories_consumed - today.calories_burned }} kcal
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if calorie_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Entries</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Consumed</th><th>Burned</th><th>Details</th></tr></thead>
+                <tbody>
+                    {% for entry in calorie_history[-10:]|reverse %}
+                    <tr>
+                        <td>{{ (entry.logged_at|string)[:10] }}</td>
+                        <td>{{ entry.calories_consumed }} kcal</td>
+                        <td>{{ entry.calories_burned }} kcal</td>
+                        <td>{{ entry.meal_details or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Sleep Tab -->
+<div class="tab-content" id="tab-sleep">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Sleep</h3>
+        <form id="sleepForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Hours Slept</label>
+                    <input type="number" name="hours" class="form-control" placeholder="e.g. 7.5" step="0.5" min="0" max="24" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sleep Quality</label>
+                    <select name="quality" class="form-select">
+                        <option value="Excellent">😊 Excellent</option>
+                        <option value="Good" selected>🙂 Good</option>
+                        <option value="Fair">😐 Fair</option>
+                        <option value="Poor">😴 Poor</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'sleep', '/tracking/sleep')">Log Sleep</button>
+        </form>
+    </div>
+
+    {% if sleep_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Entries</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Hours</th><th>Quality</th></tr></thead>
+                <tbody>
+                    {% for entry in sleep_history[-10:]|reverse %}
+                    <tr>
+                        <td>{{ (entry.logged_at|string)[:10] }}</td>
+                        <td>{{ entry.sleep_hours }} hrs</td>
+                        <td><span class="badge badge-{{ 'success' if entry.sleep_quality == 'Excellent' else ('info' if entry.sleep_quality == 'Good' else ('warning' if entry.sleep_quality == 'Fair' else 'danger')) }}">{{ entry.sleep_quality }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Workout Tab -->
+<div class="tab-content" id="tab-workout">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Workout</h3>
+        <form id="workoutForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Workout Type</label>
+                    <select name="workout_type" class="form-select" required>
+                        <option value="Cardio">🏃 Cardio</option>
+                        <option value="Strength">🏋️ Strength</option>
+                        <option value="HIIT">⚡ HIIT</option>
+                        <option value="Yoga">🧘 Yoga</option>
+                        <option value="Stretching">🤸 Stretching</option>
+                        <option value="Sports">⚽ Sports</option>
+                        <option value="Other">🎯 Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Duration (minutes)</label>
+                    <input type="number" name="duration" class="form-control" placeholder="e.g. 45" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Calories Burned</label>
+                <input type="number" name="calories_burned" class="form-control" placeholder="e.g. 300" value="0">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Exercises</label>
+                <textarea name="exercises" class="form-control" placeholder="e.g. Squats 3x12, Bench Press 3x10..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <input type="text" name="notes" class="form-control" placeholder="How was the workout?">
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'workout', '/tracking/workout')">Log Workout</button>
+        </form>
+    </div>
+
+    {% if workout_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Workouts</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Type</th><th>Duration</th><th>Calories</th></tr></thead>
+                <tbody>
+                    {% for entry in workout_history[-10:]|reverse %}
+                    <tr>
+                        <td>{{ (entry.logged_at|string)[:10] }}</td>
+                        <td>{{ entry.workout_type }}</td>
+                        <td>{{ entry.duration_minutes }} min</td>
+                        <td>{{ entry.calories_burned }} kcal</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Steps Tab -->
+<div class="tab-content" id="tab-steps">
+    <div class="glass-card">
+        <h3 class="section-title mb-2">Log Steps</h3>
+        <form id="stepsForm" class="d-flex gap-2 align-center flex-wrap">
+            <div class="form-group" style="flex:1;min-width:200px;margin-bottom:0;">
+                <input type="number" name="steps" class="form-control" placeholder="Number of steps" required>
+            </div>
+            <button type="submit" class="btn-primary" onclick="submitTracking(event, 'steps', '/tracking/steps')">Log Steps</button>
+        </form>
+        {% if today.steps %}
+        <div class="mt-2">
+            <div class="d-flex justify-between mb-1">
+                <span class="text-muted">Today's total: {{ today.steps }} steps</span>
+                <span class="text-muted">Goal: 10,000 steps</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width: {{ [today.steps / 100, 100]|min }}%"></div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if step_history %}
+    <div class="glass-card mt-3">
+        <h3 class="section-title mb-2">Recent Entries</h3>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead><tr><th>Date</th><th>Steps</th></tr></thead>
+                <tbody>
+                    {% for entry in step_history[-10:]|reverse %}
+                    <tr><td>{{ (entry.logged_at|string)[:10] }}</td><td>{{ entry.steps }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function submitTracking(event, type, url) {
+    event.preventDefault();
+    const form = event.target.closest('form');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(data)
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast(result.message || 'Logged successfully!', 'success');
+            form.reset();
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message || 'Failed to log.', 'error');
+        }
+    })
+    .catch(() => showToast('Network error. Please try again.', 'error'));
+}
+
+function quickLogWater(amount) {
+    fetch('/tracking/water', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ amount_ml: amount })
+    })
+    .then(res => res.json())
+    .then(result => {
+        if (result.success) {
+            showToast(`Logged ${amount} ml of water!`, 'success');
+            setTimeout(() => location.reload(), 1000);
+        }
+    })
+    .catch(() => showToast('Failed to log water.', 'error'));
+}
+</script>
+{% endblock %}

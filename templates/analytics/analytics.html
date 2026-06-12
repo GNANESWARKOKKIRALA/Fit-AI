@@ -1,0 +1,329 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+
+{% block content %}
+<div class="topbar animate-on-scroll">
+    <div>
+        <h1 class="page-title">Fitness Analytics</h1>
+        <p class="page-subtitle">Deep dive performance metrics, goal predictions, habit consistency, and milestones</p>
+    </div>
+</div>
+
+<!-- TOP ANALYTICS SECTION -->
+<div class="dashboard-grid animate-on-scroll mb-4" style="grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+    <!-- Fitness Score Gauge Card -->
+    <div class="glass-card d-flex flex-column align-center justify-center text-center" style="min-height: 320px;">
+        {% if fitness_gauge %}
+            <div id="fitness-gauge-div" style="width: 100%; height: 280px;" data-chart="fitness-gauge-data"></div>
+            <script id="fitness-gauge-data" type="application/json">{{ fitness_gauge | safe }}</script>
+        {% else %}
+            <div style="font-size: 64px; margin-bottom: 16px;">📈</div>
+            <h3 class="section-title">Fitness Score</h3>
+            <p class="text-secondary" style="font-size: 14px; max-width: 250px; margin-top: 8px;">Log weight, water, calories, and workouts to calculate your score.</p>
+        {% endif %}
+    </div>
+
+    <!-- Insights & Predictions Card -->
+    <div class="glass-card d-flex flex-column justify-between" style="min-height: 320px;">
+        <div>
+            <h2 class="section-title mb-4" style="font-size: 18px;">AI Prediction & Habits</h2>
+            
+            <!-- Habit consistency -->
+            <div class="mb-4">
+                <div class="d-flex justify-between align-center mb-1">
+                    <span style="font-size: 14px; font-weight: 500; color: var(--text-secondary);">Overall Habit Consistency</span>
+                    <span style="font-size: 14px; font-weight: 600; color: var(--accent-secondary);">{{ habits.overall | default(0) }}%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" style="width: {{ habits.overall | default(0) }}%;"></div>
+                </div>
+            </div>
+
+            <!-- Prediction details -->
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-center gap-3">
+                    <span style="font-size: 24px;">🎯</span>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-secondary); display: block; text-transform: uppercase;">Goal Achievement Forecast</span>
+                        <span style="font-size: 16px; font-weight: 600; color: var(--text-primary);">
+                            {% if prediction.predicted_date %}
+                                {{ prediction.predicted_date }} 
+                                {% if prediction.on_track %}
+                                    <span class="badge badge-success" style="font-size: 10px; margin-left: 6px;">On Track</span>
+                                {% else %}
+                                    <span class="badge badge-warning" style="font-size: 10px; margin-left: 6px;">At Risk</span>
+                                {% endif %}
+                            {% else %}
+                                Not enough weight logs (need 2+)
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="d-flex align-center gap-3">
+                    <span style="font-size: 24px;">📅</span>
+                    <div>
+                        <span style="font-size: 12px; color: var(--text-secondary); display: block; text-transform: uppercase;">Estimated Days Remaining</span>
+                        <span style="font-size: 16px; font-weight: 600; color: var(--text-primary);">
+                            {% if prediction.days_remaining is not none %}
+                                {{ prediction.days_remaining }} days
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--glass-border); padding-top: 16px; margin-top: 16px;" class="d-flex gap-4">
+            <div>
+                <span class="kpi-value text-gradient" style="font-size: 24px; font-weight: 700;">{{ habits.water_consistency | default(0) }}%</span>
+                <span style="font-size: 11px; color: var(--text-secondary); display: block; text-transform: uppercase;">Water logs</span>
+            </div>
+            <div>
+                <span class="kpi-value text-gradient" style="font-size: 24px; font-weight: 700;">{{ habits.sleep_consistency | default(0) }}%</span>
+                <span style="font-size: 11px; color: var(--text-secondary); display: block; text-transform: uppercase;">Sleep logs</span>
+            </div>
+            <div>
+                <span class="kpi-value text-gradient" style="font-size: 24px; font-weight: 700;">{{ habits.workout_consistency | default(0) }}%</span>
+                <span style="font-size: 11px; color: var(--text-secondary); display: block; text-transform: uppercase;">Workouts</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS GRID -->
+<div class="chart-grid animate-on-scroll mb-4">
+    <!-- Weight Chart -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Weight Progress</h3>
+        {% if weight_chart %}
+            <div id="weight-chart-div" class="chart-container" data-chart="weight-chart-data"></div>
+            <script id="weight-chart-data" type="application/json">{{ weight_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No weight data logged recently.</div>
+        {% endif %}
+    </div>
+
+    <!-- BMI Trend Chart -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">BMI Trend</h3>
+        {% if bmi_chart %}
+            <div id="bmi-chart-div" class="chart-container" data-chart="bmi-chart-data"></div>
+            <script id="bmi-chart-data" type="application/json">{{ bmi_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No height/weight data logged.</div>
+        {% endif %}
+    </div>
+
+    <!-- Calories Burned vs Consumed -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Calorie Intake & Burn</h3>
+        {% if calories_chart %}
+            <div id="calories-chart-div" class="chart-container" data-chart="calories-chart-data"></div>
+            <script id="calories-chart-data" type="application/json">{{ calories_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No calorie data logged.</div>
+        {% endif %}
+    </div>
+
+    <!-- Workout Distribution -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Workout Types</h3>
+        {% if workout_chart %}
+            <div id="workout-chart-div" class="chart-container" data-chart="workout-chart-data"></div>
+            <script id="workout-chart-data" type="application/json">{{ workout_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No workout logs found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Sleep Hours & Quality -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Sleep Analytics</h3>
+        {% if sleep_chart %}
+            <div id="sleep-chart-div" class="chart-container" data-chart="sleep-chart-data"></div>
+            <script id="sleep-chart-data" type="application/json">{{ sleep_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No sleep logs found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Water Intake -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Hydration Progress</h3>
+        {% if water_chart %}
+            <div id="water-chart-div" class="chart-container" data-chart="water-chart-data"></div>
+            <script id="water-chart-data" type="application/json">{{ water_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No water logs found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Steps Chart -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Daily Steps</h3>
+        {% if steps_chart %}
+            <div id="steps-chart-div" class="chart-container" data-chart="steps-chart-data"></div>
+            <script id="steps-chart-data" type="application/json">{{ steps_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No step logs found.</div>
+        {% endif %}
+    </div>
+
+    <!-- Goal Progress Chart -->
+    <div class="chart-card glass-card">
+        <h3 class="chart-title">Goal Progression</h3>
+        {% if goal_chart %}
+            <div id="goal-chart-div" class="chart-container" data-chart="goal-chart-data"></div>
+            <script id="goal-chart-data" type="application/json">{{ goal_chart | safe }}</script>
+        {% else %}
+            <div class="d-flex align-center justify-center text-secondary" style="height: 300px;">No active goals found. Set goals in Profile.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- AI weekly performance report -->
+<div class="glass-card animate-on-scroll mb-4">
+    <div class="d-flex justify-between align-center mb-4 pb-3" style="border-bottom: 1px solid var(--glass-border);">
+        <div>
+            <h2 class="section-title" style="font-size: 18px; margin: 0;">Weekly Performance Analysis</h2>
+            <p class="text-secondary" style="font-size: 13px; margin-top: 4px;">Generate an AI-driven diagnostics report based on this week's activities.</p>
+        </div>
+        <button class="btn-primary" id="btn-generate-report">⚡ Generate Weekly Report</button>
+    </div>
+    
+    <div id="report-output" class="ai-result" style="display: none; max-height: 400px; overflow-y: auto;"></div>
+    
+    <!-- Previous reports dropdown -->
+    <div id="previous-reports-section" style="display: none; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+        <label class="form-label" style="font-size: 13px; font-weight: 600;">View Saved Weekly Reports</label>
+        <select class="form-select" id="saved-reports-dropdown" style="max-width: 320px; font-size: 14px;">
+            <option value="">Select a report to view...</option>
+        </select>
+    </div>
+</div>
+
+<!-- ACHIEVEMENTS BADGES -->
+<div class="glass-card animate-on-scroll">
+    <h2 class="section-title mb-4" style="font-size: 18px;">Milestones & Achievements</h2>
+    <div class="program-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        {% for badge in achievements %}
+            <div class="achievement-badge {% if badge.earned %}earned{% else %}locked{% endif %}">
+                <div class="achievement-icon">{{ badge.icon }}</div>
+                <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 4px; color: var(--text-primary);">{{ badge.name }}</h3>
+                <p class="text-secondary" style="font-size: 12px; line-height: 1.4;">{{ badge.description }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const btnGenReport = document.getElementById('btn-generate-report');
+    const reportOutput = document.getElementById('report-output');
+    const reportsSection = document.getElementById('previous-reports-section');
+    const dropdown = document.getElementById('saved-reports-dropdown');
+    
+    let reportsCache = [];
+
+    // Load saved reports list on load
+    loadPreviousReports();
+
+    async function loadPreviousReports() {
+        try {
+            const res = await fetch("{{ url_for('analytics.view_reports') }}");
+            const data = await res.json();
+            if (data.reports && data.reports.length > 0) {
+                reportsCache = data.reports;
+                reportsSection.style.display = 'block';
+                
+                // Clear and rebuild options
+                dropdown.innerHTML = '<option value="">Select a report to view...</option>';
+                data.reports.forEach(r => {
+                    const dateStr = new Date(r.created_at).toLocaleDateString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                    const option = document.createElement('option');
+                    option.value = r.id;
+                    option.textContent = `Report - ${dateStr}`;
+                    dropdown.appendChild(option);
+                });
+            }
+        } catch (err) {
+            console.error('Error loading reports:', err);
+        }
+    }
+
+    // Dropdown change listener
+    dropdown.addEventListener('change', (e) => {
+        const id = parseInt(e.target.value);
+        if (!id) {
+            reportOutput.style.display = 'none';
+            return;
+        }
+
+        const report = reportsCache.find(r => r.id === id);
+        if (report) {
+            renderReport(report.content);
+        }
+    });
+
+    btnGenReport.addEventListener('click', async () => {
+        window.FitAI.showLoading('report-output');
+        reportOutput.style.display = 'block';
+        btnGenReport.disabled = true;
+
+        try {
+            const res = await fetch("{{ url_for('analytics.generate_report') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                }
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                renderReport(data.content);
+                window.FitAI.showToast('Weekly report generated successfully!', 'success');
+                // Refresh list
+                await loadPreviousReports();
+            } else {
+                renderError(data.message || 'Generation failed.');
+            }
+        } catch (err) {
+            renderError('Network error occurred.');
+        } finally {
+            btnGenReport.disabled = false;
+        }
+    });
+
+    function renderReport(content) {
+        // Simple regex-based markdown formatter for HTML display
+        let formatted = content
+            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+            .replace(/^## (.*$)/gim, '<h2 class="mt-4 mb-2 text-gradient" style="font-size: 18px;">$1</h2>')
+            .replace(/^\* (.*$)/gim, '<li>$1</li>')
+            .replace(/^- (.*$)/gim, '<li>$1</li>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+        reportOutput.innerHTML = `<div class="fade-in" style="line-height:1.8;">${formatted}</div>`;
+        reportOutput.style.display = 'block';
+    }
+
+    function renderError(message) {
+        reportOutput.innerHTML = `
+            <div class="text-center text-secondary py-3">
+                <div style="font-size: 32px; color: var(--accent-danger);">⚠️</div>
+                <p style="font-size: 14px; margin-top: 8px;">${message}</p>
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}
