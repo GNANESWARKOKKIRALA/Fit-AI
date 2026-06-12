@@ -49,7 +49,7 @@ def validate_login(username: str, password: str) -> tuple[bool, str]:
     """Validate login form fields (presence checks only)."""
 
     if not username or not username.strip():
-        return False, 'Username is required.'
+        return False, 'Username or Email is required.'
 
     if not password:
         return False, 'Password is required.'

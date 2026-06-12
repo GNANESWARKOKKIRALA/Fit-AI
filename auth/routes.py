@@ -90,8 +90,8 @@ def login():
 
         db = get_db()
         user = db.execute(
-            'SELECT id, username, password_hash FROM users WHERE username = ?',
-            (username,)
+            'SELECT id, username, password_hash FROM users WHERE username = ? OR email = ?',
+            (username, username.lower())
         ).fetchone()
 
         if user and bcrypt.check_password_hash(user['password_hash'], password):
