@@ -17,53 +17,22 @@ Built with **Flask**, **SQLite**, **Bcrypt**, **Plotly**, **Pandas**, **NumPy**,
 
 ---
 
-## 📐 System Architecture & Data Flow
+## 📐 System Architecture & Workflow
 
-FitAI follows a layered, service-oriented architecture designed to separate presentation, routing, business logic, and database persistence cleanly.
-
-### Component Diagram
+FitAI uses a clean layout linking the Flask backend, SQLite database, NumPy forecasting logic, and the Groq AI engine:
 
 ```mermaid
 graph TD
-    User([User Browser]) -->|HTTP Requests| FL[Flask Web Server]
-    
-    subgraph Frontend Layer
-        User -->|Renders UI| CSS[Custom Glassmorphism CSS]
-        User -->|Interactive Visuals| PL[Plotly.js Charts]
-        User -->|Dynamic Actions| JS[Vanilla JS / AJAX]
-    end
-    
-    subgraph Controller Layer (Blueprints)
-        FL --> DB_BP[Dashboard BP]
-        FL --> TR_BP[Tracking BP]
-        FL --> AI_BP[AI Coach BP]
-        FL --> AN_BP[Analytics BP]
-        FL --> AU_BP[Auth BP]
-    end
-    
-    subgraph Service Layer
-        DB_BP --> PS[Profile Service]
-        TR_BP --> TS[Tracking Service]
-        AN_BP --> AS[Analytics Service]
-        AI_BP --> AE[AI Engine]
-    end
-    
-    subgraph Core Engines
-        AS -->|Linear Regression| NP[NumPy Forecasting]
-        AE -->|Chat Completion| GR[Groq API / Llama 3.3]
-    end
-    
-    subgraph Database Layer
-        TS -->|SQL Queries| SQL[(SQLite DB - fitai.db)]
-        PS -->|SQL Queries| SQL
-        AS -->|SQL Queries| SQL
-    end
+    User([User Browser]) -->|Log Metrics & Queries| Flask[Flask Web App]
+    Flask -->|Personalized Coaching| Groq[Groq Llama 3.3 Engine]
+    Flask -->|Goal Weight Trends| NumPy[NumPy Linear Regression]
+    Flask -->|Reads/Writes Logs| SQLite[(SQLite Database)]
 ```
 
-### Data Flows & Logic
-* **NumPy Analytics Forecast**: The `AnalyticsService` retrieves the user's weight log history and applies a linear regression model using `numpy.polyfit`. It calculates the slope to check whether the weight is trending toward the user's target weight. If it is on track, it computes the target intersection date; otherwise, it marks it as "Not on track".
-* **AI Coach Contextual Engine**: When a user queries the workout or meal plan generators, the `AIEngine` loads the user's biometric profile (age, gender, height, current weight, target weight, activity level, dietary preference) and sends a structured system prompt to the Groq API. This ensures the output is customized to the user's body instead of generic advice.
-* **Dual-Mode Authentication**: Users can register and sign in securely using either their unique username or email address. Passwords are encrypted on register and verified on login using Blowfish-based `bcrypt` hashing.
+### Core Workflow
+1. **Data Tracking**: Users log daily health metrics (weight, steps, sleep, water, calories, workouts) which write directly to the persistent SQLite database.
+2. **Contextual AI Coach**: The AI Coach loads the user's custom biometric profile and queries Llama 3.3 via the Groq API to return tailored diet and workout plans.
+3. **Linear Regression Forecasts**: The analytics system runs regression algorithms on weight history logs to predict the exact date the goal weight is met.
 
 ---
 
