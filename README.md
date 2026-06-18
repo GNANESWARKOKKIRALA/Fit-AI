@@ -17,22 +17,67 @@ Built with **Flask**, **SQLite**, **Bcrypt**, **Plotly**, **Pandas**, **NumPy**,
 
 ---
 
-## 📐 System Architecture & Workflow
+## 📐 System Architecture
 
-FitAI uses a clean layout linking the Flask backend, SQLite database, NumPy forecasting logic, and the Groq AI engine:
+FitAI is built on a clean split layout that links the frontend client, Flask backend web router, local database storage, NumPy statistical calculators, and the Groq AI engine:
 
 ```mermaid
 graph TD
-    User([User Browser]) -->|Log Metrics & Queries| Flask[Flask Web App]
-    Flask -->|Personalized Coaching| Groq[Groq Llama 3.3 Engine]
-    Flask -->|Goal Weight Trends| NumPy[NumPy Linear Regression]
-    Flask -->|Reads/Writes Logs| SQLite[(SQLite Database)]
+    User([User Browser]) -->|HTTP Actions| Flask[Flask Web App]
+    Flask -->|Tailored Coaching| Groq[Groq AI Llama 3.3]
+    Flask -->|Weight Forecasting| NumPy[NumPy Linear Regression]
+    Flask -->|Logs Data| SQLite[(SQLite Database)]
 ```
 
 ### Core Workflow
-1. **Data Tracking**: Users log daily health metrics (weight, steps, sleep, water, calories, workouts) which write directly to the persistent SQLite database.
-2. **Contextual AI Coach**: The AI Coach loads the user's custom biometric profile and queries Llama 3.3 via the Groq API to return tailored diet and workout plans.
-3. **Linear Regression Forecasts**: The analytics system runs regression algorithms on weight history logs to predict the exact date the goal weight is met.
+1. **Log Data**: Users input metrics (water, steps, calories, sleep, weight, workouts) which write to the persistent SQLite database.
+2. **Contextual Coaching**: The AI Coach loads the user's custom biometric profile and queries Llama 3.3 via the Groq API to return custom diet and workout plans.
+3. **Regression Modeling**: The analytics engine runs regression algorithms on weight history logs to predict the exact target completion date.
+
+---
+
+## 📁 Project Folder Architecture
+
+```text
+Fit-AI/
+├── auth/                 # Authentication route blueprint
+│   └── routes.py         # Login, registration, & logout endpoints
+├── charts/               # Plotly dashboard visualizations
+│   └── plotly_charts.py  # Python Plotly JSON builders
+├── database/             # SQLite connection & schema setup
+│   ├── db.py             # Context handlers and DB connection
+│   └── schema.sql        # Database tables definition (10 tables)
+├── routes/               # Modular app routers (Blueprints)
+│   ├── ai_coach.py       # Personal workouts and diet planners
+│   ├── analytics.py      # NumPy linear goals forecasting
+│   ├── dashboard.py      # KPI cards & Plotly chart endpoints
+│   ├── export.py         # Raw CSV downloads & health reports
+│   ├── profile.py        # Goal weight targets management
+│   └── tracking.py       # Metrics logger controller
+├── services/             # Core business logic handlers
+│   ├── ai_engine.py      # Groq Llama 3.3 chat completions integrations
+│   ├── analytics_service.py # Fitness score calculations & linear regression
+│   ├── profile_service.py # Database profiles and target goals CRUD
+│   └── tracking_service.py # Daily metrics database wrappers
+├── static/               # Client-side static assets
+│   ├── css/
+│   │   └── style.css     # Glowing glassmorphic fitness styles
+│   ├── images/           # Gold logo and icon SVGs
+│   └── js/
+│       └── app.js        # Responsive sidebar & AJAX submits
+├── templates/            # Jinja2 HTML layout views
+│   ├── ai/               # AI chatbot and coach forms
+│   ├── analytics/        # Charts report page
+│   ├── auth/             # Modern login & register layouts
+│   ├── dashboard/        # Main visual indicators dashboard
+│   ├── export/           # Logs exporter panels
+│   ├── profile/          # Target goal weight settings
+│   ├── tracking/         # Daily tracker logger & log history
+│   └── base.html         # Global HTML layout framework
+├── app.py                # Flask application factories and server runner
+├── config.py             # Environment config settings loader
+└── requirements.txt      # Python dependencies list
+```
 
 ---
 
