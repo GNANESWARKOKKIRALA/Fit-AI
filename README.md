@@ -17,6 +17,56 @@ Built with **Flask**, **SQLite**, **Bcrypt**, **Plotly**, **Pandas**, **NumPy**,
 
 ---
 
+## 📐 System Architecture & Data Flow
+
+FitAI follows a layered, service-oriented architecture designed to separate presentation, routing, business logic, and database persistence cleanly.
+
+### Component Diagram
+
+```mermaid
+graph TD
+    User([User Browser]) -->|HTTP Requests| FL[Flask Web Server]
+    
+    subgraph Frontend Layer
+        User -->|Renders UI| CSS[Custom Glassmorphism CSS]
+        User -->|Interactive Visuals| PL[Plotly.js Charts]
+        User -->|Dynamic Actions| JS[Vanilla JS / AJAX]
+    end
+    
+    subgraph Controller Layer (Blueprints)
+        FL --> DB_BP[Dashboard BP]
+        FL --> TR_BP[Tracking BP]
+        FL --> AI_BP[AI Coach BP]
+        FL --> AN_BP[Analytics BP]
+        FL --> AU_BP[Auth BP]
+    end
+    
+    subgraph Service Layer
+        DB_BP --> PS[Profile Service]
+        TR_BP --> TS[Tracking Service]
+        AN_BP --> AS[Analytics Service]
+        AI_BP --> AE[AI Engine]
+    end
+    
+    subgraph Core Engines
+        AS -->|Linear Regression| NP[NumPy Forecasting]
+        AE -->|Chat Completion| GR[Groq API / Llama 3.3]
+    end
+    
+    subgraph Database Layer
+        TS -->|SQL Queries| SQL[(SQLite DB - fitai.db)]
+        PS -->|SQL Queries| SQL
+        AS -->|SQL Queries| SQL
+    end
+```
+
+### Data Flows & Logic
+* **NumPy Analytics Forecast**: The `AnalyticsService` retrieves the user's weight log history and applies a linear regression model using `numpy.polyfit`. It calculates the slope to check whether the weight is trending toward the user's target weight. If it is on track, it computes the target intersection date; otherwise, it marks it as "Not on track".
+* **AI Coach Contextual Engine**: When a user queries the workout or meal plan generators, the `AIEngine` loads the user's biometric profile (age, gender, height, current weight, target weight, activity level, dietary preference) and sends a structured system prompt to the Groq API. This ensures the output is customized to the user's body instead of generic advice.
+* **Dual-Mode Authentication**: Users can register and sign in securely using either their unique username or email address. Passwords are encrypted on register and verified on login using Blowfish-based `bcrypt` hashing.
+
+---
+
 ## 🛠️ Technology Stack
 
 * **Backend:** Python / Flask
@@ -85,7 +135,7 @@ pip install -r requirements.txt
 ```
 
 ### 3. Environment Config
-Create a `.env` file inside `/home/anjaniprasad176/Fit-AI/.env` containing:
+Create a `.env` file inside `/home/kgap/Fit-AI/.env` containing:
 ```ini
 SECRET_KEY=some_random_secret_key
 GROQ_API_KEY=your_actual_groq_api_key
@@ -95,9 +145,9 @@ GROQ_API_KEY=your_actual_groq_api_key
 1. Go to the **Web** tab.
 2. Click **Add a new web app**, select **Manual Configuration**, and pick **Python 3.10**.
 3. Configure these path fields:
-   * **Source code directory:** `/home/anjaniprasad176/Fit-AI`
-   * **Working directory:** `/home/anjaniprasad176/Fit-AI`
-   * **Virtualenv:** `/home/anjaniprasad176/Fit-AI/venv`
+   * **Source code directory:** `/home/kgap/Fit-AI`
+   * **Working directory:** `/home/kgap/Fit-AI`
+   * **Virtualenv:** `/home/kgap/Fit-AI/venv`
 
 ### 5. WSGI Config File
 Click the link under **WSGI configuration file** in the Web tab. Delete the contents and replace them with:
@@ -105,7 +155,7 @@ Click the link under **WSGI configuration file** in the Web tab. Delete the cont
 import sys
 import os
 
-project_home = '/home/anjaniprasad176/Fit-AI'
+project_home = '/home/kgap/Fit-AI'
 if project_home not in sys.path:
     sys.path = [project_home] + sys.path
 
@@ -115,7 +165,7 @@ from app import app as application
 ### 6. Map Static Files (Optional but Recommended)
 On the Web tab, under **Static files**, map static files to bypass Flask:
 * **URL:** `/static/`
-* **Path:** `/home/anjaniprasad176/Fit-AI/static`
+* **Path:** `/home/kgap/Fit-AI/static`
 
 ### 7. Reload
-Click the green **Reload** button at the top of the page. Your app is live at `https://anjaniprasad176.pythonanywhere.com`!
+Click the green **Reload** button at the top of the page. Your app is live at `https://kgap.pythonanywhere.com`!
