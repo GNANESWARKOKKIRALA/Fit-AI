@@ -35,36 +35,112 @@
 </div>
 
 <!-- KPI Cards -->
+{% set cal_pct = [((today.calories_consumed|default(0) / 2000) * 100)|int, 100]|min %}
+{% set cal_offset = 201.06 - (201.06 * cal_pct / 100) %}
+
+{% set water_pct = [((today.water_ml|default(0) / 2500) * 100)|int, 100]|min %}
+{% set water_offset = 201.06 - (201.06 * water_pct / 100) %}
+
+{% set sleep_pct = [((today.sleep_hours|default(0) / 8) * 100)|int, 100]|min %}
+{% set sleep_offset = 201.06 - (201.06 * sleep_pct / 100) %}
+
+{% set steps_pct = [((today.steps|default(0) / 10000) * 100)|int, 100]|min %}
+{% set steps_offset = 201.06 - (201.06 * steps_pct / 100) %}
+
+{% set fit_pct = fitness_score|default(0)|int %}
+{% set fit_offset = 201.06 - (201.06 * fit_pct / 100) %}
+
 <div class="kpi-grid fade-in">
-    <div class="kpi-card">
-        <div class="kpi-icon">🔥</div>
-        <div class="kpi-value">{{ today.calories_consumed|default(0) }}</div>
-        <div class="kpi-label">Today's Calories (kcal)</div>
+    <!-- Calories Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Active Calories</div>
+            <div class="stat-value">{{ today.calories_consumed|default(0) }}</div>
+            <div class="stat-sub">Goal: 2000 kcal</div>
+        </div>
+        <div class="stat-visual">
+            <svg class="progress-ring" width="72" height="72">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.04)" stroke-width="5.5" fill="transparent" r="32" cx="36" cy="36"/>
+                <circle class="progress-ring__circle" stroke="url(#glow-purple)" stroke-dasharray="201.06" stroke-dashoffset="{{ cal_offset }}" stroke-width="5.5" stroke-linecap="round" fill="transparent" r="32" cx="36" cy="36"/>
+            </svg>
+            <div class="visual-icon">⚡</div>
+        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-icon">💧</div>
-        <div class="kpi-value">{{ today.water_ml|default(0) }}</div>
-        <div class="kpi-label">Water Intake (ml)</div>
+
+    <!-- Water Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Hydration</div>
+            <div class="stat-value">{{ today.water_ml|default(0) }}</div>
+            <div class="stat-sub">Goal: 2500 ml</div>
+        </div>
+        <div class="stat-visual">
+            <svg class="progress-ring" width="72" height="72">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.04)" stroke-width="5.5" fill="transparent" r="32" cx="36" cy="36"/>
+                <circle class="progress-ring__circle" stroke="url(#glow-cyan)" stroke-dasharray="201.06" stroke-dashoffset="{{ water_offset }}" stroke-width="5.5" stroke-linecap="round" fill="transparent" r="32" cx="36" cy="36"/>
+            </svg>
+            <div class="visual-icon">💧</div>
+        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-icon">😴</div>
-        <div class="kpi-value">{{ today.sleep_hours|default(0) }}</div>
-        <div class="kpi-label">Sleep (hrs)</div>
+
+    <!-- Sleep Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Sleep</div>
+            <div class="stat-value">{{ today.sleep_hours|default(0) }}</div>
+            <div class="stat-sub">Goal: 8 hrs</div>
+        </div>
+        <div class="stat-visual">
+            <svg class="progress-ring" width="72" height="72">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.04)" stroke-width="5.5" fill="transparent" r="32" cx="36" cy="36"/>
+                <circle class="progress-ring__circle" stroke="url(#glow-yellow)" stroke-dasharray="201.06" stroke-dashoffset="{{ sleep_offset }}" stroke-width="5.5" stroke-linecap="round" fill="transparent" r="32" cx="36" cy="36"/>
+            </svg>
+            <div class="visual-icon">😴</div>
+        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-icon">👣</div>
-        <div class="kpi-value">{{ today.steps|default(0) }}</div>
-        <div class="kpi-label">Steps</div>
+
+    <!-- Steps Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Daily Steps</div>
+            <div class="stat-value">{{ today.steps|default(0) }}</div>
+            <div class="stat-sub">Goal: 10k steps</div>
+        </div>
+        <div class="stat-visual">
+            <svg class="progress-ring" width="72" height="72">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.04)" stroke-width="5.5" fill="transparent" r="32" cx="36" cy="36"/>
+                <circle class="progress-ring__circle" stroke="url(#glow-green)" stroke-dasharray="201.06" stroke-dashoffset="{{ steps_offset }}" stroke-width="5.5" stroke-linecap="round" fill="transparent" r="32" cx="36" cy="36"/>
+            </svg>
+            <div class="visual-icon">👣</div>
+        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-icon">🔥</div>
-        <div class="kpi-value">{{ streak|default(0) }}</div>
-        <div class="kpi-label">Streak (days)</div>
+
+    <!-- Streak Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Active Streak</div>
+            <div class="stat-value">{{ streak|default(0) }}</div>
+            <div class="stat-sub">Consecutive days</div>
+        </div>
+        <div class="stat-visual">
+            <div class="visual-icon glow-flame" style="font-size: 38px;">🔥</div>
+        </div>
     </div>
-    <div class="kpi-card">
-        <div class="kpi-icon">💪</div>
-        <div class="kpi-value">{{ fitness_score|default(0) }}<span style="font-size:14px;color:var(--text-secondary);">/100</span></div>
-        <div class="kpi-label">Fitness Score</div>
+
+    <!-- Fitness Score Card -->
+    <div class="kpi-card-premium">
+        <div class="stat-info">
+            <div class="stat-label">Fitness Score</div>
+            <div class="stat-value">{{ fitness_score|default(0) }}<span style="font-size: 14px; color: var(--text-secondary); font-weight: 500;">/100</span></div>
+            <div class="stat-sub">Based on consistency</div>
+        </div>
+        <div class="stat-visual">
+            <svg class="progress-ring" width="72" height="72">
+                <circle class="progress-ring__circle-bg" stroke="rgba(255, 255, 255, 0.04)" stroke-width="5.5" fill="transparent" r="32" cx="36" cy="36"/>
+                <circle class="progress-ring__circle" stroke="url(#glow-purple)" stroke-dasharray="201.06" stroke-dashoffset="{{ fit_offset }}" stroke-width="5.5" stroke-linecap="round" fill="transparent" r="32" cx="36" cy="36"/>
+            </svg>
+            <div class="visual-icon">🏆</div>
+        </div>
     </div>
 </div>
 

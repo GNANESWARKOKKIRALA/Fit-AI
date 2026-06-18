@@ -47,6 +47,12 @@ html {
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-primary);
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.06) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.06) 0px, transparent 50%),
+        linear-gradient(to right, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.008) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px;
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
@@ -96,7 +102,7 @@ a:hover {
 /* ===== SIDEBAR ===== */
 .sidebar {
     width: 280px;
-    background: rgba(9, 9, 22, 0.7);
+    background: rgba(9, 9, 22, 0.75);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     position: fixed;
@@ -213,10 +219,11 @@ a:hover {
 
 /* ===== GLASSMORPHISM CARDS ===== */
 .glass-card {
-    background: var(--glass-bg);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) border-box;
+    border: 1.5px solid transparent;
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
     padding: 28px;
     box-shadow: var(--glass-shadow);
@@ -225,8 +232,9 @@ a:hover {
 
 .glass-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(139, 92, 246, 0.25);
-    box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.2);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.35)) border-box;
+    box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.25);
 }
 
 /* ===== KPI CARDS ===== */
@@ -238,10 +246,11 @@ a:hover {
 }
 
 .kpi-card {
-    background: var(--glass-bg);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) border-box;
+    border: 1.5px solid transparent;
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
     padding: 28px;
     box-shadow: var(--glass-shadow);
@@ -257,13 +266,14 @@ a:hover {
     right: -50%;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%);
     pointer-events: none;
 }
 
 .kpi-card:hover {
     transform: translateY(-6px);
-    border-color: rgba(139, 92, 246, 0.3);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.35)) border-box;
     box-shadow: 0 20px 45px -10px rgba(139, 92, 246, 0.25);
 }
 
@@ -330,10 +340,11 @@ a:hover {
 }
 
 .chart-card {
-    background: var(--glass-bg);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) border-box;
+    border: 1.5px solid transparent;
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border: 1px solid var(--glass-border);
     border-radius: var(--border-radius);
     padding: 28px;
     box-shadow: var(--glass-shadow);
@@ -342,7 +353,8 @@ a:hover {
 
 .chart-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(139, 92, 246, 0.25);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.35)) border-box;
     box-shadow: 0 20px 40px -15px rgba(139, 92, 246, 0.2);
 }
 
@@ -374,15 +386,16 @@ a:hover {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), 0 0 15px rgba(6, 182, 212, 0.25);
 }
 
 .btn-primary:active {
-    transform: translateY(0);
+    transform: scale(0.97);
 }
 
 .btn-primary:disabled {
@@ -1465,3 +1478,147 @@ textarea.form-control {
         gap: 8px;
     }
 }
+
+/* ===== PREMIUM MODERN FITNESS UI ADDITIONS ===== */
+.kpi-card-premium {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)) border-box;
+    border: 1.5px solid transparent;
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: var(--border-radius);
+    padding: 24px;
+    box-shadow: var(--glass-shadow);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-card-premium::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.kpi-card-premium:hover {
+    transform: translateY(-5px);
+    background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
+                linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.35)) border-box;
+    box-shadow: 0 20px 45px -10px rgba(139, 92, 246, 0.25);
+}
+
+.kpi-card-premium .stat-info {
+    flex: 1;
+}
+
+.kpi-card-premium .stat-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.kpi-card-premium .stat-value {
+    font-size: 30px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.kpi-card-premium .stat-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.kpi-card-premium .stat-visual {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 12px;
+}
+
+.progress-ring {
+    transform: rotate(-90deg);
+}
+
+.progress-ring__circle {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: 50% 50%;
+}
+
+.kpi-card-premium .visual-icon {
+    position: absolute;
+    font-size: 22px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.1));
+}
+
+/* Glowing Flame Animation */
+.glow-flame {
+    animation: flamePulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px #EF4444);
+}
+
+@keyframes flamePulse {
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.7)); }
+    50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.9)); }
+}
+
+/* Glassmorphism Sidebar Enhancements */
+.sidebar-nav .nav-item.active {
+    border-left: 4px solid var(--accent-primary);
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.02) 100%);
+    box-shadow: inset 4px 0 10px rgba(139, 92, 246, 0.1);
+    color: #fff;
+}
+
+/* Top background decoration */
+.bg-grid-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(at 20% 0%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
+        radial-gradient(at 80% 0%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* App Header Visuals */
+.header-badge {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--glass-border);
+    padding: 6px 12px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.header-badge span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-success);
+    box-shadow: 0 0 8px var(--accent-success);
+}
+
