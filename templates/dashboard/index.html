@@ -55,7 +55,7 @@
     <div class="kpi-card-premium">
         <div class="stat-info">
             <div class="stat-label">Active Calories</div>
-            <div class="stat-value">{{ today.calories_consumed|default(0) }}</div>
+            <div class="stat-value">{{ today.calories_consumed|default(0)|int }}</div>
             <div class="stat-sub">Goal: 2000 kcal</div>
         </div>
         <div class="stat-visual">
@@ -71,7 +71,7 @@
     <div class="kpi-card-premium">
         <div class="stat-info">
             <div class="stat-label">Hydration</div>
-            <div class="stat-value">{{ today.water_ml|default(0) }}</div>
+            <div class="stat-value">{{ today.water_ml|default(0)|int }}</div>
             <div class="stat-sub">Goal: 2500 ml</div>
         </div>
         <div class="stat-visual">
@@ -103,7 +103,7 @@
     <div class="kpi-card-premium">
         <div class="stat-info">
             <div class="stat-label">Daily Steps</div>
-            <div class="stat-value">{{ today.steps|default(0) }}</div>
+            <div class="stat-value">{{ today.steps|default(0)|int }}</div>
             <div class="stat-sub">Goal: 10k steps</div>
         </div>
         <div class="stat-visual">

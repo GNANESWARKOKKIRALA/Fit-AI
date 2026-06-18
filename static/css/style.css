@@ -240,7 +240,7 @@ a:hover {
 /* ===== KPI CARDS ===== */
 .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 24px;
     margin-bottom: 40px;
 }
@@ -1401,9 +1401,6 @@ textarea.form-control {
     .chart-grid {
         grid-template-columns: 1fr;
     }
-    .kpi-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    }
 }
 
 @media (max-width: 992px) {
@@ -1427,9 +1424,6 @@ textarea.form-control {
 }
 
 @media (max-width: 768px) {
-    .kpi-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    }
     .auth-card {
         padding: 32px 24px;
     }
@@ -1579,7 +1573,16 @@ textarea.form-control {
 
 .kpi-card-premium .visual-icon {
     position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 22px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
     filter: drop-shadow(0 0 6px rgba(255,255,255,0.1));
 }
 
