@@ -130,6 +130,23 @@ class AnalyticsService:
             days = np.array([w['day'] for w in weights])
             weight_vals = np.array([w['weight'] for w in weights])
 
+            # Avoid SVD convergence error if all entries logged on same day
+            if days[-1] - days[0] < 0.01:
+                return {'predicted_date': None, 'on_track': False, 'days_remaining': None}
+
+            first_weight = weight_vals[0]
+            current_weight = weight_vals[-1]
+
+            # 1. Check if goal is already achieved
+            is_weight_loss = first_weight > goal_weight
+            if is_weight_loss:
+                achieved = current_weight <= goal_weight
+            else:
+                achieved = current_weight >= goal_weight
+
+            if achieved:
+                return {'predicted_date': 'Achieved!', 'on_track': True, 'days_remaining': 0}
+
             # Normalize days to start from 0
             days_normalized = days - days[0]
 
@@ -138,16 +155,14 @@ class AnalyticsService:
             slope = coeffs[0]
             intercept = coeffs[1]
 
-            current_weight = weight_vals[-1]
-
-            # Check if moving toward goal
+            # 2. Check if moving toward goal
             on_track = (goal_weight < current_weight and slope < 0) or \
                        (goal_weight > current_weight and slope > 0)
 
-            if abs(slope) < 0.001:
-                return {'predicted_date': None, 'on_track': False, 'days_remaining': None}
+            if not on_track or abs(slope) < 0.001:
+                return {'predicted_date': 'Not on track', 'on_track': False, 'days_remaining': None}
 
-            # Calculate days to goal
+            # 3. Calculate days to goal
             days_to_goal = (goal_weight - intercept) / slope - days_normalized[-1]
 
             if days_to_goal <= 0:
@@ -157,7 +172,7 @@ class AnalyticsService:
 
             return {
                 'predicted_date': predicted_date,
-                'on_track': on_track,
+                'on_track': True,
                 'days_remaining': int(days_to_goal)
             }
         except Exception as e:
