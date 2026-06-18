@@ -1,0 +1,315 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>FitAI Interview Preparation Guide</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        line-height: 1.5;
+        color: #333333;
+        margin: 40px;
+        background-color: #ffffff;
+    }
+    
+    /* Document Header block mimicking the blue box at top of PDF */
+    .doc-header {
+        background-color: #1e293b;
+        color: #ffffff;
+        text-align: center;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    .doc-header h1 {
+        margin: 0;
+        font-size: 18pt;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+    .doc-author {
+        text-align: center;
+        font-size: 9.5pt;
+        color: #64748b;
+        margin-bottom: 25px;
+    }
+
+    /* Section Banner: styled exactly like the blue/green banners in the PDF */
+    .section-banner {
+        background-color: #0d9488; /* Teal color matching Project 2 green/teal theme */
+        color: #ffffff;
+        font-size: 12pt;
+        font-weight: bold;
+        padding: 10px 15px;
+        margin-top: 25px;
+        margin-bottom: 15px;
+        letter-spacing: 0.5px;
+    }
+
+    /* Sub-section headers */
+    .sub-banner {
+        background-color: #0f766e;
+        color: #ffffff;
+        font-size: 11pt;
+        font-weight: bold;
+        padding: 8px 12px;
+        margin-bottom: 15px;
+    }
+
+    p.abstract {
+        font-size: 10.5pt;
+        color: #334155;
+        margin-bottom: 20px;
+        text-align: justify;
+    }
+    strong {
+        color: #0f172a;
+    }
+
+    /* System Architecture grid styling for Word tables */
+    .arch-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 15px;
+        margin-bottom: 20px;
+    }
+    .arch-box {
+        background-color: #0d9488;
+        color: #ffffff;
+        text-align: center;
+        padding: 12px 10px;
+        width: 22%;
+        font-size: 9.5pt;
+        vertical-align: top;
+        border-radius: 4px;
+    }
+    .arch-num {
+        background-color: #ffffff;
+        color: #0d9488;
+        font-weight: bold;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+        text-align: center;
+        line-height: 20px;
+        margin-bottom: 5px;
+        font-size: 9.5pt;
+    }
+    .arch-title {
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+    .arch-desc {
+        font-size: 8pt;
+        color: #ccfbf1;
+    }
+    .arch-arrow {
+        text-align: center;
+        color: #0d9488;
+        font-weight: bold;
+        font-size: 16pt;
+        vertical-align: middle;
+        width: 4%;
+    }
+
+    /* Tech Stack Table styling */
+    .tech-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 25px;
+        font-size: 10pt;
+    }
+    .tech-table th {
+        background-color: #2563eb;
+        color: #ffffff;
+        text-align: left;
+        padding: 8px 12px;
+        font-weight: bold;
+        border: 1px solid #cbd5e1;
+    }
+    .tech-table td {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        color: #334155;
+    }
+    .tech-table tr:nth-child(even) {
+        background-color: #f8fafc;
+    }
+
+    /* Q&A section styling */
+    .qa-group {
+        margin-bottom: 18px;
+    }
+    .question {
+        font-weight: bold;
+        font-size: 10.5pt;
+        color: #0f172a;
+        margin-bottom: 4px;
+    }
+    .answer {
+        font-size: 10.5pt;
+        color: #334155;
+        margin-left: 15px;
+        margin-bottom: 12px;
+    }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+    <h1>MY PROJECTS — INTERVIEW PREPARATION GUIDE</h1>
+</div>
+<div class="doc-author">
+    K. GNANESWAR | Project 1: AI Gap-Chatbot · Project 2: AI Fitness App · Project 3: AirCanvas
+</div>
+
+<div class="section-banner">
+    PROJECT 2 — AI-Powered Fitness Application (FitAI)
+</div>
+
+<div class="sub-banner">
+    Abstract — What to Say in Interview
+</div>
+<p class="abstract">
+    <strong>FitAI</strong> is a premium, full-stack health tracking and AI-driven coaching web application. Users register and log in securely with passwords hashed using <strong>bcrypt</strong>. They can log workouts, water, weight, steps, sleep, and calorie balances. The system uses <strong>NumPy</strong> to perform linear regression calculations on historical weight logs to predict the target date a user will achieve their fitness goal. <strong>Plotly</strong> generates 10 dark-themed interactive charts to visualize progress, and the application constructs rich data prompts to call <strong>LLaMA 3.3 70B</strong> via the <strong>Groq API</strong> to serve custom training programs and meal plans. Data is stored in a local, persistent <strong>SQLite</strong> database, and the application is deployed on <strong>PythonAnywhere</strong>.
+</p>
+
+<div class="sub-banner">
+    System Architecture
+</div>
+
+<!-- Row 1: Steps 1-4 -->
+<table class="arch-table">
+    <tr>
+        <td class="arch-box">
+            <span class="arch-num">1</span>
+            <div class="arch-title">User Registration / Login</div>
+            <div class="arch-desc">Bcrypt password hashing & username/email check</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">2</span>
+            <div class="arch-title">Enter Profile Details</div>
+            <div class="arch-desc">Age, weight, height, activity level, fitness goal</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">3</span>
+            <div class="arch-title">Track Daily Habits</div>
+            <div class="arch-desc">Log workouts, water, steps, sleep, and calories</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">4</span>
+            <div class="arch-title">NumPy Goal Forecast</div>
+            <div class="arch-desc">Linear regression calculations on weight logs</div>
+        </td>
+    </tr>
+</table>
+
+<!-- Row 2: Steps 5-8 -->
+<table class="arch-table">
+    <tr>
+        <td class="arch-box">
+            <span class="arch-num">5</span>
+            <div class="arch-title">Build AI Prompt</div>
+            <div class="arch-desc">Inject profile metrics & target values to Groq payload</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">6</span>
+            <div class="arch-title">LLaMA 3.3 70B via Groq</div>
+            <div class="arch-desc">API call with exponential-backoff retry loops</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">7</span>
+            <div class="arch-title">Display Dashboard</div>
+            <div class="arch-desc">Premium glassmorphism UI & interactive Plotly charts</div>
+        </td>
+        <td class="arch-arrow">➔</td>
+        <td class="arch-box">
+            <span class="arch-num">8</span>
+            <div class="arch-title">Store Data</div>
+            <div class="arch-desc">Persistent local SQLite database storage</div>
+        </td>
+    </tr>
+</table>
+
+<div class="sub-banner">
+    Tech Stack & Library Roles
+</div>
+
+<table class="tech-table">
+    <thead>
+        <tr>
+            <th style="width: 30%;">Library / Tool</th>
+            <th style="width: 70%;">Role in Project</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>Flask (Python)</strong></td>
+            <td>Backend — handles route architecture, session controls, and app context configuration</td>
+        </tr>
+        <tr>
+            <td><strong>SQLite</strong></td>
+            <td>Database — stores user profile settings, login credentials, and daily habit tracking logs</td>
+        </tr>
+        <tr>
+            <td><strong>bcrypt</strong></td>
+            <td>Security — handles Blowfish password encryption before database storage</td>
+        </tr>
+        <tr>
+            <td><strong>Groq API (Llama 3.3)</strong></td>
+            <td>AI — generates personalized meals, workouts, and context-aware chat conversation responses</td>
+        </tr>
+        <tr>
+            <td><strong>NumPy</strong></td>
+            <td>Analytics — runs linear regression checks on weight entries to forecast target dates</td>
+        </tr>
+        <tr>
+            <td><strong>Pandas</strong></td>
+            <td>Data Exports — processes logs and exports them cleanly to CSV files</td>
+        </tr>
+        <tr>
+            <td><strong>Plotly.js</strong></td>
+            <td>Visualizations — compiles 10 dark-themed interactive charts rendered client-side</td>
+        </tr>
+        <tr>
+            <td><strong>python-dotenv</strong></td>
+            <td>Configuration — loads API keys and secure configuration files on startup</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="sub-banner">
+    Key Interview Q&A
+</div>
+
+<div class="qa-group">
+    <div class="question">Q: Did you train the AI model?</div>
+    <div class="answer">→ No. I used a pre-trained LLaMA 3.3 70B model via the Groq API. My focus was on designing the full-stack tracking architecture, prompt engineering structures, and user interfaces around it.</div>
+</div>
+
+<div class="qa-group">
+    <div class="question">Q: What is your contribution?</div>
+    <div class="answer">→ I built the full-stack system: setup the SQLite database schemas, implemented secure password hashing and dual-mode login (username/email), built the NumPy weight forecasting calculations, compiled Plotly chart rendering pipelines, and designed the premium responsive glassmorphism CSS interface.</div>
+</div>
+
+<div class="qa-group">
+    <div class="question">Q: Why SQLite instead of SQL Server or PostgreSQL?</div>
+    <div class="answer">→ SQLite is a local file-based database that requires zero system setup overhead. Since users only log their own entries, write concurrency is low, making SQLite incredibly fast, portable, and ideal for free persistent hosting on PythonAnywhere.</div>
+</div>
+
+<div class="qa-group">
+    <div class="question">Q: What is prompt engineering?</div>
+    <div class="answer">→ Designing system prompts to direct the LLM's role, format, and answers—for example, injecting the user's BMI, age, and fitness goals into the prompt to ensure the output workouts and diets are personalized and accurate.</div>
+</div>
+
+<div class="qa-group">
+    <div class="question">Q: How does the NumPy linear regression weight predictor work?</div>
+    <div class="answer">→ I extracted the user's weight entries as coordinates (date, weight) and fit them to a straight line ($y = mx + c$) using `np.polyfit`. Solving this equation for the user's target weight gives us the target timestamp.</div>
+</div>
+
+</body>
+</html>
