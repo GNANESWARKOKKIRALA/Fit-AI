@@ -7,7 +7,7 @@
     <title>{% block title %}FitAI{% endblock %} | FitAI - AI Fitness Coach</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.5">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
@@ -46,13 +46,13 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <span class="nav-icon">🏠</span> Dashboard
                 </a>
                 <a href="{{ url_for('profile.profile') }}" class="nav-item {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
                     <span class="nav-icon">👤</span> Profile
                 </a>
                 <a href="{{ url_for('tracking.tracking') }}" class="nav-item {% if request.endpoint and 'tracking' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">📈</span> Tracking
+                    <span class="nav-icon">📝</span> Tracking
                 </a>
                 <a href="{{ url_for('ai_coach.coach') }}" class="nav-item {% if request.endpoint == 'ai_coach.coach' %}active{% endif %}">
                     <span class="nav-icon">🤖</span> AI Coach
@@ -61,7 +61,7 @@
                     <span class="nav-icon">💬</span> AI Chat
                 </a>
                 <a href="{{ url_for('analytics.analytics') }}" class="nav-item {% if request.endpoint and 'analytics' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">🔬</span> Analytics
+                    <span class="nav-icon">📊</span> Analytics
                 </a>
                 <a href="{{ url_for('export.export_page') }}" class="nav-item {% if request.endpoint and 'export' in request.endpoint %}active{% endif %}">
                     <span class="nav-icon">📥</span> Export
