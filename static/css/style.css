@@ -1622,3 +1622,114 @@ textarea.form-control {
     box-shadow: 0 0 8px var(--accent-success);
 }
 
+/* ===== MODERN PREMIUM INPUT FIELDS & FORMS ===== */
+.form-group-premium {
+    margin-bottom: 24px;
+}
+
+.form-label-premium {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.input-wrapper-premium {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.input-icon-premium {
+    position: absolute;
+    left: 18px;
+    color: var(--text-muted);
+    font-size: 19px;
+    transition: var(--transition);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.form-control-premium {
+    width: 100%;
+    padding: 14px 18px 14px 48px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    transition: var(--transition);
+    outline: none;
+    z-index: 1;
+}
+
+.form-control-premium:focus {
+    border-color: var(--accent-primary);
+    background: rgba(139, 92, 246, 0.04);
+    box-shadow: 0 0 25px -5px rgba(139, 92, 246, 0.25), inset 0 0 10px rgba(139, 92, 246, 0.05);
+}
+
+.input-wrapper-premium:focus-within .input-icon-premium {
+    color: var(--accent-primary);
+    filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.5));
+}
+
+/* Sidebar premium list fixes */
+.sidebar-nav .nav-icon {
+    font-size: 20px;
+    margin-right: 4px;
+    transition: var(--transition);
+}
+
+.sidebar-nav .nav-item:hover .nav-icon {
+    color: var(--accent-primary);
+    transform: scale(1.1);
+}
+
+.sidebar-nav .nav-item.active .nav-icon {
+    color: var(--accent-secondary);
+    filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.4));
+}
+
+/* Immersive background decoration for auth pages */
+.auth-bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.005) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.005) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+}
+
+/* Welcome Card Premium adjustments */
+.welcome-card-premium {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(6, 182, 212, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--border-radius);
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+}
+
+.welcome-card-premium::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(50px);
+    pointer-events: none;
+}
+
+

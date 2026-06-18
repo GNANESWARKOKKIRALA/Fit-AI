@@ -12,25 +12,25 @@
     </div>
 </div>
 
-<div class="welcome-card fade-in mb-4" style="position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;">
+<div class="welcome-card-premium fade-in mb-4" style="display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap;">
     <!-- Graphical orb background for card -->
     <div style="position: absolute; top: -50px; right: -50px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(6,182,212,0.18), transparent 70%); border-radius: 50%; filter: blur(40px); pointer-events: none;"></div>
     <div style="position: absolute; bottom: -50px; left: -50px; width: 180px; height: 180px; background: radial-gradient(circle, rgba(124,58,237,0.15), transparent 70%); border-radius: 50%; filter: blur(45px); pointer-events: none;"></div>
     
     <div style="flex: 1; min-width: 280px; z-index: 1;">
-        <h2 class="welcome-title text-gradient" style="font-weight: 700; font-size: 26px;">Welcome back, {{ session.username }}! 👋</h2>
-        <p class="text-secondary" style="font-size:15px;line-height:1.6;margin-bottom:16px;margin-top:8px;">
-            Welcome to your premium, AI-powered fitness coach and health analytics platform. Use the menu to log daily tracker metrics, generate custom workout plans, or get immediate support from Coach FitAI.
+        <h2 class="welcome-title text-gradient" style="font-weight: 800; font-size: 30px; letter-spacing: -0.03em;">Welcome back, {{ session.username }}! 👋</h2>
+        <p class="text-secondary" style="font-size:15px;line-height:1.6;margin-bottom:20px;margin-top:10px;max-width:640px;">
+            Elevate your training, analyze performance statistics in real-time, and get bespoke insights from Coach FitAI. Start your daily log or query the AI assistant below.
         </p>
         <div class="d-flex align-center gap-2">
-            <span class="badge" style="background: rgba(6,182,212,0.12); color: var(--accent-secondary); border: 1px solid rgba(6,182,212,0.25); padding:4px 10px; font-size:12px; font-weight:600; border-radius:20px;">🤖 AI Engine Online</span>
-            <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--accent-success); border: 1px solid rgba(16,185,129,0.25); padding:4px 10px; font-size:12px; font-weight:600; border-radius:20px;">🔥 {{ streak }} Day Streak</span>
+            <span class="badge" style="background: rgba(6,182,212,0.12); color: var(--accent-secondary); border: 1px solid rgba(6,182,212,0.25); padding:6px 12px; font-size:12px; font-weight:600; border-radius:20px; display:inline-flex; align-items:center; gap:6px;"><i class="ri-instance-line" style="font-size:14px;"></i> AI Engine Online</span>
+            <span class="badge" style="background: rgba(16,185,129,0.12); color: var(--accent-success); border: 1px solid rgba(16,185,129,0.25); padding:6px 12px; font-size:12px; font-weight:600; border-radius:20px; display:inline-flex; align-items:center; gap:6px;"><i class="ri-fire-line" style="font-size:14px;"></i> {{ streak }} Day Streak</span>
         </div>
     </div>
     
     <!-- Mini Graphic Graphic badge -->
     <div class="welcome-badge-graphic" style="z-index: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border); padding: 10px; border-radius: 50%; box-shadow: var(--glass-shadow); backdrop-filter: blur(10px);">
-        <img src="{{ url_for('static', filename='images/gnaneswar_logo_edited.png') }}?v=1.3" alt="Gnaneswar Logo" style="width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.3));">
+        <img src="{{ url_for('static', filename='images/gnaneswar_logo_edited.png') }}?v=1.3" alt="Gnaneswar Logo" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.08); filter: drop-shadow(0 0 10px rgba(124, 58, 237, 0.45));">
     </div>
 </div>
 

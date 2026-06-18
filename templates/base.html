@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="FitAI - AI-Powered Fitness Coach & Health Analytics Platform">
     <title>{% block title %}FitAI{% endblock %} | FitAI - AI Fitness Coach</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.0">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=2.1">
     <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
 <body>
@@ -41,34 +42,34 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="FitAI" width="40" height="40">
-                <span class="text-gradient" style="font-size:24px;font-weight:700;">FitAI</span>
+                <span class="sidebar-logo-text">FitAI</span>
             </div>
             <nav class="sidebar-nav">
                 <a href="{{ url_for('dashboard.dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard.dashboard' %}active{% endif %}">
-                    <span class="nav-icon">📊</span> Dashboard
+                    <i class="ri-dashboard-3-line nav-icon"></i> Dashboard
                 </a>
                 <a href="{{ url_for('profile.profile') }}" class="nav-item {% if request.endpoint and 'profile' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">👤</span> Profile
+                    <i class="ri-user-3-line nav-icon"></i> Profile
                 </a>
                 <a href="{{ url_for('tracking.tracking') }}" class="nav-item {% if request.endpoint and 'tracking' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">📈</span> Tracking
+                    <i class="ri-heart-pulse-line nav-icon"></i> Tracking
                 </a>
                 <a href="{{ url_for('ai_coach.coach') }}" class="nav-item {% if request.endpoint == 'ai_coach.coach' %}active{% endif %}">
-                    <span class="nav-icon">🤖</span> AI Coach
+                    <i class="ri-robot-line nav-icon"></i> AI Coach
                 </a>
                 <a href="{{ url_for('ai_coach.chat') }}" class="nav-item {% if request.endpoint == 'ai_coach.chat' %}active{% endif %}">
-                    <span class="nav-icon">💬</span> AI Chat
+                    <i class="ri-chat-3-line nav-icon"></i> AI Chat
                 </a>
                 <a href="{{ url_for('analytics.analytics') }}" class="nav-item {% if request.endpoint and 'analytics' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">🔬</span> Analytics
+                    <i class="ri-bar-chart-2-line nav-icon"></i> Analytics
                 </a>
                 <a href="{{ url_for('export.export_page') }}" class="nav-item {% if request.endpoint and 'export' in request.endpoint %}active{% endif %}">
-                    <span class="nav-icon">📥</span> Export
+                    <i class="ri-download-cloud-2-line nav-icon"></i> Export
                 </a>
             </nav>
             <div style="padding:16px;border-top:1px solid var(--glass-border);">
                 <a href="{{ url_for('auth.logout') }}" class="nav-item" style="color:var(--accent-danger);">
-                    <span class="nav-icon">🚪</span> Logout
+                    <i class="ri-logout-box-r-line nav-icon"></i> Logout
                 </a>
             </div>
         </aside>
