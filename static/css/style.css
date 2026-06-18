@@ -1700,19 +1700,21 @@ textarea.form-control {
 
 /* Sidebar premium list fixes */
 .sidebar-nav .nav-icon {
-    font-size: 20px;
-    margin-right: 4px;
+    font-size: 19px;
+    margin-right: 8px;
+    display: inline-block;
     transition: var(--transition);
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.05));
 }
 
 .sidebar-nav .nav-item:hover .nav-icon {
-    color: var(--accent-primary);
-    transform: scale(1.1);
+    transform: scale(1.2) rotate(6deg);
+    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
 }
 
 .sidebar-nav .nav-item.active .nav-icon {
-    color: var(--accent-secondary);
-    filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.4));
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6)) drop-shadow(0 0 20px rgba(6, 182, 212, 0.4));
 }
 
 /* Immersive background decoration for auth pages */
