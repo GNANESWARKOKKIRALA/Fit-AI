@@ -1486,6 +1486,47 @@ textarea.form-control {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 8px;
     }
+    
+    /* Premium KPI Card Mobile optimization */
+    .kpi-card-premium {
+        padding: 16px 10px;
+        flex-direction: column-reverse;
+        align-items: center;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .kpi-card-premium .stat-info {
+        width: 100%;
+    }
+    
+    .kpi-card-premium .stat-visual {
+        margin-left: 0;
+        width: 58px;
+        height: 58px;
+    }
+    
+    .kpi-card-premium .stat-visual svg {
+        width: 58px;
+        height: 58px;
+    }
+    
+    .kpi-card-premium .stat-value {
+        font-size: 22px;
+    }
+    
+    .kpi-card-premium .stat-label {
+        font-size: 10px;
+        letter-spacing: 0.5px;
+    }
+    
+    .kpi-card-premium .stat-sub {
+        font-size: 11px;
+    }
+    
+    .kpi-card-premium .visual-icon {
+        font-size: 18px;
+    }
 }
 
 /* ===== PREMIUM MODERN FITNESS UI ADDITIONS ===== */
