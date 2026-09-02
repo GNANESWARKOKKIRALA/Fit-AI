@@ -9,6 +9,7 @@ via the Groq LLM API (llama-3.3-70b-versatile).
 import os
 import time
 import logging
+import re
 from groq import Groq
 
 logger = logging.getLogger(__name__)
@@ -39,7 +40,10 @@ class AIEngine:
                     temperature=temperature,
                     max_tokens=max_tokens,
                 )
-                return response.choices[0].message.content
+                content = response.choices[0].message.content
+                if content:
+                    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                return content
             except Exception as e:
                 if 'rate_limit' in str(e).lower() or '429' in str(e):
                     time.sleep(2 ** attempt)
@@ -164,7 +168,8 @@ class AIEngine:
         user_prompt = (
             "Generate a short, powerful motivational message for someone on "
             "their fitness journey. Keep it to 2-3 sentences. Make it "
-            "personal, energetic, and actionable. No generic platitudes."
+            "personal, energetic, and actionable. No generic platitudes.\n\n"
+            f"[System Note: Request timestamp seed = {time.time()}]"
         )
         messages = [
             {'role': 'system', 'content': system_prompt},

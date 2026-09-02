@@ -167,7 +167,7 @@
         <button class="btn-ghost btn-icon" onclick="refreshMotivation()" title="Refresh motivation">🔄</button>
     </div>
     <p id="motivationText" style="color:var(--text-secondary);font-size:16px;line-height:1.6;margin:0;font-style:italic;">
-        {{ motivation|default('Click refresh to get your daily motivation! 💪') }}
+        Retrieving daily motivation... <span class="spinner-border spinner-border-sm" role="status" style="width: 1rem; height: 1rem; border-width: 0.15em; display: inline-block; vertical-align: middle; margin-left: 6px;"></span>
     </p>
 </div>
 
@@ -223,24 +223,58 @@
     /* Refresh daily motivation via AJAX */
     function refreshMotivation() {
         const btn = event.currentTarget;
-        btn.disabled = true;
-        btn.style.opacity = '0.5';
+        if (btn) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        }
 
-        fetch('{{ url_for("ai_coach.generate_motivation") }}', {
+        const motivationEl = document.getElementById('motivationText');
+        motivationEl.innerHTML = 'Retrieving daily motivation... <span class="spinner-border spinner-border-sm" role="status" style="width: 1rem; height: 1rem; border-width: 0.15em; display: inline-block; vertical-align: middle; margin-left: 6px;"></span>';
+
+        fetch('{{ url_for("ai_coach.generate_motivation") }}?t=' + Date.now(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' }
         })
         .then(response => response.json())
         .then(data => {
             if (data.content || data.motivation) {
-                document.getElementById('motivationText').textContent = data.content || data.motivation;
+                motivationEl.textContent = data.content || data.motivation;
+            } else {
+                motivationEl.textContent = "Ignite your potential today! 💪";
             }
         })
-        .catch(err => console.error('Failed to refresh motivation:', err))
+        .catch(err => {
+            console.error('Failed to refresh motivation:', err);
+            motivationEl.textContent = "Ignite your potential today! 💪";
+        })
         .finally(() => {
-            btn.disabled = false;
-            btn.style.opacity = '1';
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
         });
     }
+
+    /* Auto-load motivation quote on page ready */
+    document.addEventListener('DOMContentLoaded', () => {
+        // Trigger initial motivation load
+        const motivationEl = document.getElementById('motivationText');
+        fetch('{{ url_for("ai_coach.generate_motivation") }}?t=' + Date.now(), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.content || data.motivation) {
+                motivationEl.textContent = data.content || data.motivation;
+            } else {
+                motivationEl.textContent = "Ignite your potential today! 💪";
+            }
+        })
+        .catch(err => {
+            console.error('Failed to load motivation:', err);
+            motivationEl.textContent = "Ignite your potential today! 💪";
+        });
+    });
 </script>
 {% endblock %}

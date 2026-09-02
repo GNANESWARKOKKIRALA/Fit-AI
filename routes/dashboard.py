@@ -85,13 +85,8 @@ def dashboard():
             list(type_counts.keys()), list(type_counts.values())
         )
 
-    # --- AI motivation (non-critical – degrade gracefully) ---
+    # --- AI motivation (non-critical, loaded async) ---
     motivation = None
-    try:
-        ai = AIEngine()
-        motivation = ai.generate_motivation()
-    except Exception:
-        logger.warning("Failed to generate AI motivation for user %s", user_id, exc_info=True)
 
     return render_template(
         'dashboard/index.html',
