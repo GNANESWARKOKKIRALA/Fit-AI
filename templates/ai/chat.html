@@ -112,3 +112,18 @@
     }
 </script>
 {% endblock %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof marked !== 'undefined') {
+            document.querySelectorAll('.message.ai').forEach(el => {
+                if (!el.classList.contains('typing-indicator')) {
+                    const rawText = el.textContent;
+                    el.innerHTML = marked.parse(rawText);
+                    el.classList.add('markdown-body');
+                    el.style.lineHeight = '1.6';
+                }
+            });
+        }
+    });
+</script>

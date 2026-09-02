@@ -1797,3 +1797,15 @@ textarea.form-control {
 }
 
 
+
+/* Markdown Styles */
+.markdown-body table { width: 100%; border-collapse: collapse; margin-top: 16px; margin-bottom: 24px; font-size: 14px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); }
+.markdown-body th, .markdown-body td { border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 16px; text-align: left; }
+.markdown-body th { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, rgba(236, 72, 153, 0.15) 100%); color: #fff; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.markdown-body tr:nth-child(even) { background-color: rgba(255, 255, 255, 0.02); }
+.markdown-body tr:hover { background-color: rgba(255, 255, 255, 0.05); }
+.markdown-body ul, .markdown-body ol { margin-left: 20px; margin-bottom: 16px; }
+.markdown-body h1, .markdown-body h2, .markdown-body h3 { color: #fff; margin-top: 24px; margin-bottom: 12px; }
+.markdown-body h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.markdown-body h2 { font-size: 20px; font-weight: 700; color: #06B6D4; }
+.markdown-body h3 { font-size: 16px; font-weight: 600; color: #3B82F6; }

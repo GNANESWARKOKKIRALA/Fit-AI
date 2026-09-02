@@ -304,15 +304,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function renderReport(content) {
-        // Simple regex-based markdown formatter for HTML display
-        let formatted = content
-            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-            .replace(/^## (.*$)/gim, '<h2 class="mt-4 mb-2 text-gradient" style="font-size: 18px;">$1</h2>')
-            .replace(/^\* (.*$)/gim, '<li>$1</li>')
-            .replace(/^- (.*$)/gim, '<li>$1</li>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-        reportOutput.innerHTML = `<div class="fade-in" style="line-height:1.8;">${formatted}</div>`;
+        let formatted = content;
+        if (typeof marked !== 'undefined') {
+            formatted = marked.parse(content);
+        } else {
+            formatted = content.replace(/\n/g, '<br>');
+        }
+        
+        reportOutput.innerHTML = `<div class="fade-in markdown-body" style="line-height:1.8;">${formatted}</div>`;
         reportOutput.style.display = 'block';
     }
 

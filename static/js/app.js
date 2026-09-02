@@ -318,8 +318,17 @@
      */
     appendMessage(text, cls) {
       const div = document.createElement('div');
-      div.className = `message ${cls}`;
-      div.textContent = text;
+      
+      if (cls.includes('ai') && typeof marked !== 'undefined') {
+        div.className = `message ${cls} markdown-body`;
+        div.innerHTML = marked.parse(text);
+        // Ensure child elements inside message have proper styling inheritance
+        div.style.lineHeight = '1.6';
+      } else {
+        div.className = `message ${cls}`;
+        div.textContent = text;
+      }
+      
       this.container.appendChild(div);
     },
 
