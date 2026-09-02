@@ -657,7 +657,7 @@
   /*  INIT ON DOM READY                                                  */
   /* ------------------------------------------------------------------ */
 
-  function initApp() {
+  document.addEventListener('DOMContentLoaded', () => {
     Sidebar.init();
     Tabs.init();
     Flash.init();
@@ -668,8 +668,5 @@
     CounterAnimation.init();
     Confirm.init();
     Theme.init();
-  }
-
-  document.addEventListener('DOMContentLoaded', initApp);
-  document.addEventListener('turbo:load', initApp);
+  });
 })();
