@@ -14,7 +14,7 @@ COMMON_LAYOUT = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
     font=dict(color='#e2e8f0', family='Inter, sans-serif', size=13),
-    margin=dict(t=40, b=40, l=50, r=20),
+    margin=dict(t=10, b=60, l=50, r=20),
     hovermode='x unified',
 )
 
@@ -61,7 +61,6 @@ def create_weight_chart(dates, weights, goal_weight=None):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Weight Progress', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Weight (kg)', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -94,7 +93,6 @@ def create_bmi_chart(dates, bmis):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='BMI Trends', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='BMI', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -123,7 +121,6 @@ def create_calories_chart(dates, consumed, burned):
     fig.update_layout(
         **COMMON_LAYOUT,
         barmode='group',
-        title=dict(text='Calories: Consumed vs Burned', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Calories (kcal)', gridcolor='rgba(255,255,255,0.05)'),
         legend=dict(orientation='h', y=-0.15),
@@ -149,7 +146,6 @@ def create_workout_chart(workout_types, counts, durations=None):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Workout Distribution', font=dict(size=16)),
         xaxis=dict(title='Type', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Sessions', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -186,7 +182,6 @@ def create_sleep_chart(dates, hours, qualities=None):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Sleep Analytics', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Hours', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -216,7 +211,6 @@ def create_water_chart(dates, amounts, goal_ml=2500):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Water Intake', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Amount (ml)', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -246,7 +240,6 @@ def create_steps_chart(dates, steps, goal_steps=10000):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Daily Steps', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Steps', gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -283,7 +276,6 @@ def create_goal_progress_chart(goals):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Goal Progress', font=dict(size=16)),
         xaxis=dict(range=[0, 105], title='Progress (%)', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(gridcolor='rgba(255,255,255,0.05)'),
     )
@@ -296,7 +288,6 @@ def create_fitness_score_gauge(score, previous_score=None):
     fig = go.Figure(go.Indicator(
         mode='gauge+number' + ('+delta' if previous_score is not None else ''),
         value=score,
-        title=dict(text='Fitness Score', font=dict(size=20, color='#e2e8f0')),
         delta=dict(reference=previous_score, increasing=dict(color=COLORS['success']),
                    decreasing=dict(color=COLORS['danger'])) if previous_score is not None else None,
         number=dict(font=dict(size=48, color='#e2e8f0')),
@@ -365,7 +356,6 @@ def create_weekly_comparison_chart(this_week, last_week):
             radialaxis=dict(visible=True, gridcolor='rgba(255,255,255,0.08)'),
             angularaxis=dict(gridcolor='rgba(255,255,255,0.08)'),
         ),
-        title=dict(text='Weekly Comparison', font=dict(size=16)),
         legend=dict(orientation='h', y=-0.1),
         margin=dict(t=60, b=40, l=60, r=60),
     )
@@ -390,7 +380,6 @@ def create_calorie_trend_chart(dates, net_calories):
 
     fig.update_layout(
         **COMMON_LAYOUT,
-        title=dict(text='Calorie Balance (Surplus/Deficit)', font=dict(size=16)),
         xaxis=dict(title='Date', gridcolor='rgba(255,255,255,0.05)'),
         yaxis=dict(title='Net Calories', gridcolor='rgba(255,255,255,0.05)'),
     )
