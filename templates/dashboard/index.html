@@ -160,16 +160,41 @@
     </a>
 </div>
 
-<!-- Daily Motivation -->
-<div id="motivationCard" class="glass-card fade-in" style="margin-bottom:24px;">
-    <div class="d-flex justify-between align-center" style="margin-bottom:12px;">
-        <h3 style="margin:0;color:var(--text-primary);">💡 Daily Motivation</h3>
-        <button class="btn-ghost btn-icon" onclick="refreshMotivation()" title="Refresh motivation">🔄</button>
+<!-- BMI Calculator Widget -->
+<div class="glass-card fade-in" style="margin-bottom:24px; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+    <div style="flex: 1; min-width: 250px;">
+        <h3 style="margin-top:0; color:var(--text-primary);">dY" Quick BMI Calculator</h3>
+        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:16px;">Check your Body Mass Index instantly.</p>
+        <div style="display:flex; gap:12px;">
+            <input type="number" id="bmi-weight" placeholder="Weight (kg)" class="form-control" style="width:120px;">
+            <input type="number" id="bmi-height" placeholder="Height (cm)" class="form-control" style="width:120px;">
+            <button onclick="calculateBMI()" class="btn-primary" style="padding: 8px 16px;">Calculate</button>
+        </div>
     </div>
-    <p id="motivationText" style="color:var(--text-secondary);font-size:16px;line-height:1.6;margin:0;font-style:italic;">
-        Retrieving daily motivation... <span class="spinner-border spinner-border-sm" role="status" style="width: 1rem; height: 1rem; border-width: 0.15em; display: inline-block; vertical-align: middle; margin-left: 6px;"></span>
-    </p>
+    <div style="flex: 1; text-align: center; min-width: 200px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px;">
+        <div id="bmi-result-value" style="font-size: 36px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">--.-</div>
+        <div id="bmi-result-label" style="font-size: 14px; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 1px;">Enter Details</div>
+    </div>
 </div>
+<script>
+function calculateBMI() {
+    const w = parseFloat(document.getElementById('bmi-weight').value);
+    const h = parseFloat(document.getElementById('bmi-height').value) / 100;
+    if (w > 0 && h > 0) {
+        const bmi = (w / (h * h)).toFixed(1);
+        document.getElementById('bmi-result-value').innerText = bmi;
+        let label = 'Normal';
+        let color = 'var(--accent-success)';
+        if (bmi < 18.5) { label = 'Underweight'; color = 'var(--accent-secondary)'; }
+        else if (bmi >= 25 && bmi < 30) { label = 'Overweight'; color = 'var(--accent-warning)'; }
+        else if (bmi >= 30) { label = 'Obese'; color = 'var(--accent-danger)'; }
+        
+        const labelEl = document.getElementById('bmi-result-label');
+        labelEl.innerText = label;
+        labelEl.style.color = color;
+    }
+}
+</script>
 
 <!-- Charts Grid -->
 <div class="chart-grid fade-in">
