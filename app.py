@@ -42,6 +42,7 @@ def create_app():
     app.register_blueprint(ai_bp)
     app.register_blueprint(analytics_bp)
     app.register_blueprint(export_bp)
+    app.register_blueprint(schedule_bp)
 
     # Root redirect
     @app.route('/')

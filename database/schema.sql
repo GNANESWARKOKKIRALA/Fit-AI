@@ -139,3 +139,17 @@ CREATE INDEX IF NOT EXISTS idx_sleep_logs_user_id      ON sleep_logs (user_id);
 CREATE INDEX IF NOT EXISTS idx_ai_reports_user_id      ON ai_reports (user_id);
 CREATE INDEX IF NOT EXISTS idx_chat_history_user_id    ON chat_history (user_id);
 CREATE INDEX IF NOT EXISTS idx_step_logs_user_id       ON step_logs (user_id);
+
+-- Workout schedule (future workouts)
+CREATE TABLE IF NOT EXISTS workout_schedule (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    scheduled_date TEXT NOT NULL,
+    workout_type TEXT NOT NULL,
+    time_of_day TEXT,
+    notes TEXT,
+    completed BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_workout_schedule_user_id ON workout_schedule (user_id);

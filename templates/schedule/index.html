@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Workout Schedule{% endblock %}
+
+{% block content %}
+<div class="topbar">
+    <div>
+        <h1 class="page-title">Workout Schedule</h1>
+    </div>
+</div>
+
+<div class="calendar-container fade-in">
+    <div class="calendar-header">
+        <a href="{{ url_for('schedule.schedule_index', year=prev_year, month=prev_month) }}" class="btn-ghost btn-icon">
+            <i class="ri-arrow-left-s-line"></i>
+        </a>
+        <h2 class="calendar-title">{{ month_name }} {{ year }}</h2>
+        <a href="{{ url_for('schedule.schedule_index', year=next_year, month=next_month) }}" class="btn-ghost btn-icon">
+            <i class="ri-arrow-right-s-line"></i>
+        </a>
+    </div>
+
+    <div class="calendar-grid">
+        <div class="calendar-day-header">Mon</div>
+        <div class="calendar-day-header">Tue</div>
+        <div class="calendar-day-header">Wed</div>
+        <div class="calendar-day-header">Thu</div>
+        <div class="calendar-day-header">Fri</div>
+        <div class="calendar-day-header">Sat</div>
+        <div class="calendar-day-header">Sun</div>
+
+        {% for week in month_days %}
+            {% for day in week %}
+                {% set date_str = day.strftime('%Y-%m-%d') %}
+                {% set is_today = (day == now) %}
+                {% set is_current_month = (day.month == month) %}
+                
+                <div class="calendar-day {% if not is_current_month %}other-month{% endif %} {% if is_today %}today{% endif %}"
+                     onclick="openScheduleModal('{{ date_str }}')">
+                    
+                    <div class="day-number">{{ day.day }}</div>
+                    
+                    <div class="day-workouts">
+                        {% if date_str in scheduled_workouts %}
+                            {% for workout in scheduled_workouts[date_str] %}
+                                <div class="workout-badge {% if workout.completed %}completed{% endif %}" 
+                                     onclick="event.stopPropagation(); toggleWorkout({{ workout.id }}, {{ 'true' if not workout.completed else 'false' }})">
+                                    <span class="workout-type">{{ workout.workout_type }}</span>
+                                    {% if workout.time_of_day %}
+                                        <span class="workout-time">{{ workout.time_of_day }}</span>
+                                    {% endif %}
+                                    <button class="delete-workout-btn" onclick="event.stopPropagation(); deleteWorkout({{ workout.id }})">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Workout Modal -->
+<div id="scheduleModal" class="modal">
+    <div class="modal-content glass-card">
+        <div class="modal-header">
+            <h3>Schedule Workout</h3>
+            <button class="btn-icon" onclick="closeScheduleModal()"><i class="ri-close-line"></i></button>
+        </div>
+        <form id="scheduleForm" onsubmit="submitSchedule(event)">
+            <input type="hidden" id="schedule-date">
+            
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="display-date" class="form-control" disabled>
+            </div>
+            
+            <div class="form-group">
+                <label>Workout Type</label>
+                <input type="text" id="schedule-type" class="form-control" placeholder="e.g. Upper Body, 5k Run" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Time (Optional)</label>
+                <input type="time" id="schedule-time" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label>Notes (Optional)</label>
+                <textarea id="schedule-notes" class="form-control" rows="2" placeholder="Focus on progressive overload..."></textarea>
+            </div>
+            
+            <div class="form-actions" style="margin-top: 20px;">
+                <button type="button" class="btn-ghost" onclick="closeScheduleModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Save to Calendar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openScheduleModal(dateStr) {
+    document.getElementById('schedule-date').value = dateStr;
+    document.getElementById('display-date').value = dateStr;
+    document.getElementById('scheduleModal').classList.add('active');
+    document.getElementById('schedule-type').focus();
+}
+
+function closeScheduleModal() {
+    document.getElementById('scheduleModal').classList.remove('active');
+    document.getElementById('scheduleForm').reset();
+}
+
+async function submitSchedule(e) {
+    e.preventDefault();
+    
+    const data = {
+        date: document.getElementById('schedule-date').value,
+        type: document.getElementById('schedule-type').value,
+        time: document.getElementById('schedule-time').value,
+        notes: document.getElementById('schedule-notes').value
+    };
+    
+    try {
+        const response = await fetch("{{ url_for('schedule.add_workout') }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Failed to schedule workout.');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred.');
+    }
+}
+
+async function toggleWorkout(id, completed) {
+    try {
+        const response = await fetch(`{{ url_for('schedule.schedule_index') }}${id}/toggle`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({completed: completed})
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function deleteWorkout(id) {
+    if (!confirm('Remove this scheduled workout?')) return;
+    
+    try {
+        const response = await fetch(`{{ url_for('schedule.schedule_index') }}${id}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            window.location.reload();
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+</script>
+{% endblock %}

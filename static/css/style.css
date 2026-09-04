@@ -1809,3 +1809,26 @@ textarea.form-control {
 .markdown-body h1 { font-size: 24px; font-weight: 800; background: linear-gradient(90deg, #8B5CF6, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .markdown-body h2 { font-size: 20px; font-weight: 700; color: #06B6D4; }
 .markdown-body h3 { font-size: 16px; font-weight: 600; color: #3B82F6; }
+
+/* Calendar Styles */
+.calendar-container { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; padding: 24px; box-shadow: var(--glass-shadow); backdrop-filter: blur(12px); }
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.calendar-title { font-size: 24px; font-weight: 700; color: #fff; margin: 0; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.calendar-day-header { text-align: center; font-weight: 600; color: var(--text-secondary); padding-bottom: 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+.calendar-day { background: rgba(0, 0, 0, 0.2); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; min-height: 120px; padding: 12px; cursor: pointer; transition: all 0.2s ease; position: relative; }
+.calendar-day:hover { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+.calendar-day.other-month { opacity: 0.3; }
+.calendar-day.today { border-color: var(--accent-primary); box-shadow: 0 0 15px rgba(139, 92, 246, 0.15); }
+.day-number { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.calendar-day.today .day-number { color: var(--accent-primary); }
+
+.day-workouts { display: flex; flex-direction: column; gap: 6px; }
+.workout-badge { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(236, 72, 153, 0.15)); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 6px; padding: 6px 8px; font-size: 12px; display: flex; flex-direction: column; position: relative; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
+.workout-badge:hover { background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(236, 72, 153, 0.25)); }
+.workout-badge.completed { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); opacity: 0.7; }
+.workout-type { font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.workout-time { color: var(--text-secondary); font-size: 11px; margin-top: 2px; }
+.delete-workout-btn { position: absolute; top: 4px; right: 4px; background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 2px; display: none; border-radius: 4px; }
+.delete-workout-btn:hover { background: rgba(239, 68, 68, 0.2); color: #EF4444; }
+.workout-badge:hover .delete-workout-btn { display: block; }
