@@ -34,6 +34,7 @@ def create_app():
     from routes.ai_coach import bp as ai_bp
     from routes.analytics import bp as analytics_bp
     from routes.export import bp as export_bp
+    from routes.schedule import schedule_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)
