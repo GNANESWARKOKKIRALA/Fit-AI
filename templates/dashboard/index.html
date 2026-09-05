@@ -196,38 +196,50 @@ function calculateBMI() {
 }
 </script>
 
-<!-- Charts Grid -->
-<div class="chart-grid fade-in">
-    <div class="chart-card">
-        <h3 class="chart-title">📉 Weight Progress</h3>
-        <div id="weightChart" class="chart-container"></div>
-        {% if not weight_chart %}
-        <p style="text-align:center;color:var(--text-secondary);padding:40px 0;">Log your weight to see trends</p>
-        {% endif %}
+
+<!-- Bodybuilding & Gym Visuals -->
+<div class="gym-visuals-grid fade-in" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 24px;">
+    
+    <!-- Current Split -->
+    <div class="glass-card" style="position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; padding: 30px; background: linear-gradient(135deg, rgba(20,20,25,0.8), rgba(30,30,40,0.9));">
+        <div style="position: absolute; right: -20px; bottom: -20px; font-size: 150px; opacity: 0.05; transform: rotate(-15deg);">💪</div>
+        <h3 style="color: var(--text-secondary); font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-top: 0;">Today's Split</h3>
+        <h2 style="font-size: 32px; font-weight: 800; margin: 10px 0; background: linear-gradient(90deg, #8B5CF6, #06B6D4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Chest & Triceps</h2>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">Bench Press</span>
+            <span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">Incline DB</span>
+            <span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">Dips</span>
+        </div>
     </div>
-    <div class="chart-card">
-        <h3 class="chart-title">🔥 Calories Trend</h3>
-        <div id="caloriesChart" class="chart-container"></div>
-        {% if not calories_chart %}
-        <p style="text-align:center;color:var(--text-secondary);padding:40px 0;">Log calories to see trends</p>
-        {% endif %}
+
+    <!-- Power Level Graphic -->
+    <div class="glass-card" style="position: relative; overflow: hidden; display: flex; align-items: center; padding: 30px; background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(139,92,246,0.1)); border: 1px solid rgba(236,72,153,0.2);">
+        <div style="flex: 1;">
+            <h3 style="color: #fff; margin-top: 0; margin-bottom: 5px;">Power Output</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Estimated 1RM Growth</p>
+            
+            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+                <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #EC4899, #8B5CF6); border-radius: 10px; box-shadow: 0 0 10px rgba(236,72,153,0.5);"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); font-weight: 600;">
+                <span>Squat: +15kg</span>
+                <span style="color: #EC4899;">PR Incoming</span>
+            </div>
+        </div>
     </div>
-    <div class="chart-card">
-        <h3 class="chart-title">🏋️ Workout Activity</h3>
-        <div id="workoutChart" class="chart-container"></div>
-        {% if not workout_chart %}
-        <p style="text-align:center;color:var(--text-secondary);padding:40px 0;">Log workouts to see activity</p>
-        {% endif %}
+
+    <!-- Gym Motivation Image -->
+    <div class="glass-card" style="padding: 0; overflow: hidden; position: relative; min-height: 200px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop'); background-size: cover; background-position: center; opacity: 0.5; filter: grayscale(100%) contrast(1.2);"></div>
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(0deg, rgba(15,15,20,0.9) 0%, rgba(15,15,20,0.2) 100%);"></div>
+        <div style="position: absolute; bottom: 25px; left: 25px; right: 25px;">
+            <h3 style="color: #fff; font-size: 20px; font-weight: 800; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 1px;">No Excuses</h3>
+            <p style="color: rgba(255,255,255,0.7); font-size: 14px; margin: 0;">Discipline is doing what you hate to do, but doing it like you love it.</p>
+        </div>
     </div>
+
 </div>
 
-<style>
-    @media (max-width: 576px) {
-        .welcome-badge-graphic {
-            display: none !important;
-        }
-    }
-</style>
 {% endblock %}
 
 {% block scripts %}
