@@ -221,4 +221,4 @@ def export_report():
         )
     except Exception as e:
         logger.error(f'Error generating PDF report: {e}')
-        return 'Report generation failed', 500
+        import traceback; return 'Report generation failed: ' + traceback.format_exc(), 500
