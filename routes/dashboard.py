@@ -21,6 +21,10 @@ from charts.plotly_charts import (
     create_workout_chart,
 )
 from utils.decorators import login_required
+from utils.calculations import (
+    calculate_bmi, calculate_bmr, calculate_tdee, 
+    calculate_macro_targets, parse_workout_volume
+)
 
 logger = logging.getLogger(__name__)
 
@@ -44,12 +48,34 @@ def dashboard():
     user_id = session['user_id']
 
     # --- Core profile & daily summary ---
-    profile = ProfileService.get_profile(db, user_id)
+    profile = ProfileService.get_profile(db, user_id) or {}
     today_summary = TrackingService.get_today_summary(db, user_id)
 
     # --- Analytics data ---
     streak = AnalyticsService.get_streak(db, user_id)
     fitness_score = AnalyticsService.calculate_fitness_score(db, user_id)
+
+    # --- ADVANCED CALCULATIONS ---
+    weight_kg = profile.get('weight')
+    height_cm = profile.get('height')
+    age = profile.get('age')
+    gender = profile.get('gender')
+    activity = profile.get('activity_level', 'moderate')
+    goal = profile.get('fitness_goal', 'maintenance')
+    
+    bmi, bmi_cat = calculate_bmi(weight_kg, height_cm)
+    bmr = calculate_bmr(weight_kg, height_cm, age, gender)
+    tdee = calculate_tdee(bmr, activity)
+    macros = calculate_macro_targets(tdee, weight_kg, goal) if tdee else None
+
+    # Calculate Volume
+    workout_history_30d = TrackingService.get_workout_history(db, user_id, days=30)
+    total_volume = 0
+    workout_count_30d = len(workout_history_30d) if workout_history_30d else 0
+    if workout_history_30d:
+        for w in workout_history_30d:
+            if w.get('exercises'):
+                total_volume += parse_workout_volume(w['exercises'])
 
     # --- Chart data (30-day weight, 7-day calories, 30-day workouts) ---
     weight_history = TrackingService.get_weight_history(db, user_id, days=30)
@@ -76,17 +102,13 @@ def dashboard():
             [daily_cals[d]['burned'] for d in sorted_days]
         )
 
-    workout_history = TrackingService.get_workout_history(db, user_id, days=30)
     workout_chart_json = None
-    if workout_history:
+    if workout_history_30d:
         from collections import Counter
-        type_counts = Counter(w['workout_type'] for w in workout_history)
+        type_counts = Counter(w['workout_type'] for w in workout_history_30d)
         workout_chart_json = create_workout_chart(
             list(type_counts.keys()), list(type_counts.values())
         )
-
-    # --- AI motivation (non-critical, loaded async) ---
-    motivation = None
 
     return render_template(
         'dashboard/index.html',
@@ -98,5 +120,11 @@ def dashboard():
         weight_chart=weight_chart_json,
         calories_chart=calories_chart_json,
         workout_chart=workout_chart_json,
-        motivation=motivation,
+        bmi=bmi,
+        bmi_cat=bmi_cat,
+        bmr=bmr,
+        tdee=tdee,
+        macros=macros,
+        total_volume=total_volume,
+        workout_count_30d=workout_count_30d
     )
