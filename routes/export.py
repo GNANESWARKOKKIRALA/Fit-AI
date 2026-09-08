@@ -1,27 +1,30 @@
 """
 FitAI - Export Routes
-CSV and report export functionality.
+CSV and professional PDF report export functionality.
 """
 import io
 import logging
-from datetime import datetime
-from flask import Blueprint, render_template, session, Response
+from datetime import datetime, timedelta
+from flask import Blueprint, render_template, session, Response, request
 from database.db import get_db
 from services.tracking_service import TrackingService
 from services.analytics_service import AnalyticsService
 from services.profile_service import ProfileService
+from services.ai_engine import AIEngine
 from utils.decorators import login_required
+from utils.calculations import (
+    calculate_bmi, calculate_bmr, calculate_tdee, 
+    calculate_macro_targets, parse_workout_volume
+)
 
 logger = logging.getLogger(__name__)
 bp = Blueprint('export', __name__, url_prefix='/export')
-
 
 @bp.route('/')
 @login_required
 def export_page():
     """Render export options page."""
     return render_template('export/export.html')
-
 
 @bp.route('/csv/<data_type>')
 @login_required
@@ -76,7 +79,6 @@ def export_csv(data_type):
             df = pd.DataFrame(columns=config['headers'])
         else:
             df = pd.DataFrame(data)
-            # Select and rename columns
             available_cols = [c for c in config['columns'] if c in df.columns]
             df = df[available_cols]
             rename_map = dict(zip(available_cols, config['headers'][:len(available_cols)]))
@@ -101,11 +103,13 @@ def export_csv(data_type):
 @bp.route('/report/pdf')
 @login_required
 def export_report():
-    """Generate and download a comprehensive fitness report (PDF or TXT fallback)."""
+    """Generate and download a comprehensive 8-page fitness report in PDF format."""
     db = get_db()
     user_id = session['user_id']
+    username = db.execute('SELECT username FROM users WHERE id = ?', (user_id,)).fetchone()['username']
 
     try:
+        # 1. Fetch all data
         profile = ProfileService.get_profile(db, user_id) or {}
         today_summary = TrackingService.get_today_summary(db, user_id)
         weekly_summary = TrackingService.get_weekly_summary(db, user_id)
@@ -114,137 +118,223 @@ def export_report():
         prediction = AnalyticsService.predict_goal_achievement(db, user_id)
         streak = AnalyticsService.get_streak(db, user_id)
         
-        timestamp = datetime.now().strftime('%Y%m%d')
+        # Extended data
+        workouts_30d = TrackingService.get_workout_history(db, user_id, days=30)
+        weight_30d = TrackingService.get_weight_history(db, user_id, days=30)
+        cals_30d = TrackingService.get_calorie_history(db, user_id, days=30)
         
+        # 2. Derived Calculations
+        weight_kg = profile.get('weight')
+        height_cm = profile.get('height')
+        age = profile.get('age')
+        gender = profile.get('gender')
+        activity = profile.get('activity_level', 'moderate')
+        goal = profile.get('fitness_goal', 'maintenance')
+        
+        bmi, bmi_cat = calculate_bmi(weight_kg, height_cm)
+        bmr = calculate_bmr(weight_kg, height_cm, age, gender)
+        tdee = calculate_tdee(bmr, activity)
+        macros = calculate_macro_targets(tdee, weight_kg, goal) if tdee else None
+        
+        # Calculate Volume
+        total_volume = 0
+        workout_types = {}
+        for w in workouts_30d:
+            w_type = w.get('workout_type', 'General')
+            workout_types[w_type] = workout_types.get(w_type, 0) + 1
+            if w.get('exercises'):
+                total_volume += parse_workout_volume(w['exercises'])
+                
+        # 3. AI Insights
+        ai = AIEngine()
+        ai_insight = "Insufficient data to generate AI insights."
+        if weight_30d or workouts_30d or cals_30d:
+            prompt = [
+                {"role": "system", "content": "You are a professional fitness coach writing a short, 2-paragraph insight summary for a client's monthly report. Focus on their adherence, volume, and progress. Do not use markdown headers, just plain text paragraphs."},
+                {"role": "user", "content": f"Client {username} logged {len(workouts_30d)} workouts, {len(cals_30d)} meal days. Consistency: {fitness_score}%. Volume: {total_volume}kg. Goal: {goal}. Write the insight summary."}
+            ]
+            ai_insight = ai._call_api(prompt, max_tokens=250)
+
+        # 4. Generate PDF
         try:
             from fpdf import FPDF
             
             class PDF(FPDF):
                 def header(self):
-                    self.set_font('Helvetica', 'B', 15)
-                    self.set_text_color(41, 128, 185)
-                    self.cell(0, 10, 'FitAI - Fitness Analytics Report', 0, 1, 'C')
+                    self.set_font('Helvetica', 'B', 16)
+                    self.set_text_color(15, 23, 42)
+                    self.cell(0, 15, 'FitAI Fitness Assessment System', 0, 1, 'C')
+                    self.set_draw_color(59, 130, 246) # Blue line
+                    self.line(10, 25, 200, 25)
                     self.ln(5)
 
                 def footer(self):
                     self.set_y(-15)
                     self.set_font('Helvetica', 'I', 8)
-                    self.set_text_color(128, 128, 128)
+                    self.set_text_color(100, 116, 139)
                     self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
 
+                def page_title(self, title):
+                    self.set_font('Helvetica', 'B', 20)
+                    self.set_text_color(30, 41, 59)
+                    self.cell(0, 12, title, 0, 1, 'C')
+                    self.ln(10)
+
                 def section_title(self, title):
-                    self.set_font('Helvetica', 'B', 12)
+                    self.set_font('Helvetica', 'B', 14)
                     self.set_text_color(255, 255, 255)
-                    self.set_fill_color(52, 73, 94)
-                    self.cell(0, 8, f'  {title}', 0, 1, 'L', fill=True)
+                    self.set_fill_color(30, 41, 59)
+                    self.cell(0, 10, f'  {title}', 0, 1, 'L', fill=True)
+                    self.ln(4)
+                    
+                def sub_title(self, title):
+                    self.set_font('Helvetica', 'B', 12)
+                    self.set_text_color(15, 23, 42)
+                    self.cell(0, 8, title, 0, 1, 'L')
                     self.ln(2)
 
-                def section_body(self, data_list):
+                def key_value_row(self, key, value, w1=60, w2=130):
+                    self.set_font('Helvetica', 'B', 11)
+                    self.set_text_color(100, 116, 139)
+                    self.cell(w1, 8, key, 0, 0, 'L')
                     self.set_font('Helvetica', '', 11)
-                    self.set_text_color(50, 50, 50)
-                    for item in data_list:
-                        self.cell(0, 6, item, 0, 1)
-                    self.ln(5)
+                    self.set_text_color(15, 23, 42)
+                    self.cell(w2, 8, str(value), 0, 1, 'L')
+                    
+                def simple_text(self, text):
+                    self.set_font('Helvetica', '', 11)
+                    self.set_text_color(15, 23, 42)
+                    self.multi_cell(0, 7, text)
+                    self.ln(4)
 
             pdf = PDF()
+            pdf.set_auto_page_break(auto=True, margin=15)
+            
+            # --- PAGE 1: OVERVIEW ---
             pdf.add_page()
-            pdf.set_font('Helvetica', '', 10)
-            pdf.set_text_color(100, 100, 100)
-            pdf.cell(0, 5, f"Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", 0, 1, 'C')
+            pdf.page_title('Monthly Fitness Report')
+            pdf.simple_text(f"Client: {username.upper()}")
+            pdf.simple_text(f"Report Date: {datetime.now().strftime('%B %d, %Y')}")
             pdf.ln(10)
-
-            pdf.section_title('PROFILE')
-            pdf.section_body([
-                f"Age: {profile.get('age', 'N/A')}", f"Gender: {profile.get('gender', 'N/A')}",
-                f"Height: {profile.get('height', 'N/A')} cm", f"Weight: {profile.get('weight', 'N/A')} kg",
-                f"Goal Weight: {profile.get('goal_weight', 'N/A')} kg", f"Fitness Goal: {profile.get('fitness_goal', 'N/A')}",
-                f"Activity Level: {profile.get('activity_level', 'N/A')}"
-            ])
-
-            pdf.section_title('FITNESS SCORE')
-            pdf.section_body([f"Overall Score: {fitness_score}/100", f"Current Streak: {streak} days"])
-
-            pdf.section_title("TODAY'S SUMMARY")
-            pdf.section_body([
-                f"Calories: {today_summary.get('calories_consumed', 0)} kcal in / {today_summary.get('calories_burned', 0)} kcal out",
-                f"Water: {today_summary.get('water_ml', 0)} ml", f"Sleep: {today_summary.get('sleep_hours', 0)} hrs",
-                f"Steps: {today_summary.get('steps', 0)}", f"Workouts: {today_summary.get('workout_count', 0)}"
-            ])
-
-            pdf.section_title('WEEKLY AVERAGES')
-            pdf.section_body([
-                f"Avg Calories: {weekly_summary.get('avg_calories_consumed', 0)} in / {weekly_summary.get('avg_calories_burned', 0)} out",
-                f"Avg Water: {weekly_summary.get('avg_water', 0)} ml", f"Avg Sleep: {weekly_summary.get('avg_sleep', 0)} hrs",
-                f"Workouts: {weekly_summary.get('workout_count', 0)}", f"Avg Steps: {weekly_summary.get('avg_steps', 0)}"
-            ])
-
-            pdf.section_title('HABIT CONSISTENCY (Last 30 Days)')
-            pdf.section_body([
-                f"Water: {habits.get('water_consistency', 0)}%", f"Sleep: {habits.get('sleep_consistency', 0)}%",
-                f"Workout: {habits.get('workout_consistency', 0)}%", f"Calorie: {habits.get('calorie_consistency', 0)}%",
-                f"Overall: {habits.get('overall', 0)}%"
-            ])
-
-            pdf.section_title('GOAL PREDICTION')
-            pdf.section_body([
-                f"Predicted Achievement: {prediction.get('predicted_date', 'N/A')}",
-                f"On Track: {'Yes' if prediction.get('on_track') else 'No'}",
-                f"Days Remaining: {prediction.get('days_remaining', 'N/A')}"
-            ])
+            
+            pdf.section_title('USER PROFILE')
+            pdf.key_value_row("Age:", profile.get('age', 'N/A'))
+            pdf.key_value_row("Gender:", str(profile.get('gender', 'N/A')).capitalize())
+            pdf.key_value_row("Height:", f"{height_cm} cm" if height_cm else "N/A")
+            pdf.key_value_row("Weight:", f"{weight_kg} kg" if weight_kg else "N/A")
+            pdf.key_value_row("Goal Weight:", f"{profile.get('goal_weight', 'N/A')} kg")
+            pdf.key_value_row("Fitness Goal:", str(profile.get('fitness_goal', 'N/A')).title())
+            pdf.key_value_row("Activity Level:", str(profile.get('activity_level', 'N/A')).title())
+            pdf.ln(10)
+            
+            pdf.section_title('FITNESS CONSISTENCY')
+            pdf.key_value_row("Overall Score:", f"{fitness_score}/100")
+            pdf.key_value_row("Current Streak:", f"{streak} Days")
+            pdf.key_value_row("Workout Consistency:", f"{habits.get('workout_consistency', 0)}%")
+            pdf.key_value_row("Nutrition Tracking:", f"{habits.get('calorie_consistency', 0)}%")
+            pdf.key_value_row("Hydration Tracking:", f"{habits.get('water_consistency', 0)}%")
+            
+            # --- PAGE 2: BODY COMPOSITION ---
+            pdf.add_page()
+            pdf.page_title('Body Composition & Metabolism')
+            
+            pdf.section_title('METRIC CALCULATIONS')
+            pdf.key_value_row("Body Mass Index (BMI):", f"{bmi} ({bmi_cat})" if bmi else "N/A")
+            pdf.key_value_row("Basal Metabolic Rate (BMR):", f"{bmr} kcal/day" if bmr else "N/A")
+            pdf.key_value_row("Total Daily Energy Exp. (TDEE):", f"{tdee} kcal/day" if tdee else "N/A")
+            pdf.ln(5)
+            pdf.simple_text("Note: BMR calculated using Mifflin-St Jeor equation. TDEE is estimated based on reported activity level.")
+            pdf.ln(10)
+            
+            pdf.section_title('WEIGHT PROGRESSION')
+            if weight_30d:
+                pdf.key_value_row("Starting Weight (30d):", f"{weight_30d[-1]['weight']} kg")
+                pdf.key_value_row("Current Weight:", f"{weight_30d[0]['weight']} kg")
+                change = weight_30d[0]['weight'] - weight_30d[-1]['weight']
+                pdf.key_value_row("Total Change:", f"{change:+.1f} kg")
+            else:
+                pdf.simple_text("Insufficient weight log data for the past 30 days.")
+                
+            pdf.ln(10)
+            pdf.section_title('GOAL TRACKING')
+            pdf.key_value_row("Predicted Achievement:", prediction.get('predicted_date', 'N/A'))
+            pdf.key_value_row("On Track:", 'Yes' if prediction.get('on_track') else 'No')
+            pdf.key_value_row("Days Remaining:", prediction.get('days_remaining', 'N/A'))
+            
+            # --- PAGE 3: NUTRITION ---
+            pdf.add_page()
+            pdf.page_title('Nutrition & Macros')
+            
+            pdf.section_title('TARGET MACRONUTRIENTS (ESTIMATED)')
+            if macros:
+                pdf.key_value_row("Target Calories:", f"{macros['target_calories']} kcal/day")
+                pdf.key_value_row("Protein:", f"{macros['protein_g']}g  (2.2g/kg bodyweight)")
+                pdf.key_value_row("Carbohydrates:", f"{macros['carb_g']}g")
+                pdf.key_value_row("Fats:", f"{macros['fat_g']}g")
+                pdf.key_value_row("Fiber:", f"{macros['fiber_g']}g")
+            else:
+                pdf.simple_text("Missing profile data to calculate macros (requires height, weight, age, gender).")
+            pdf.ln(10)
+            
+            pdf.section_title('MONTHLY CALORIE ANALYSIS')
+            pdf.key_value_row("Average Consumed:", f"{weekly_summary.get('avg_calories_consumed', 0)} kcal/day")
+            pdf.key_value_row("Average Burned:", f"{weekly_summary.get('avg_calories_burned', 0)} kcal/day")
+            
+            # --- PAGE 4: WORKOUT & VOLUME ---
+            pdf.add_page()
+            pdf.page_title('Bodybuilding & Performance')
+            
+            pdf.section_title('MONTHLY WORKOUT SUMMARY')
+            pdf.key_value_row("Total Workouts Logged:", f"{len(workouts_30d)}")
+            pdf.key_value_row("Estimated Total Volume:", f"{total_volume:,.0f} kg")
+            pdf.ln(5)
+            pdf.sub_title("Workout Breakdown")
+            for wtype, count in workout_types.items():
+                pdf.key_value_row(f"  • {wtype}:", f"{count} sessions")
+                
+            pdf.ln(10)
+            pdf.section_title('EXERCISE DETAILS (LAST 5 LOGS)')
+            if workouts_30d:
+                for w in workouts_30d[:5]:
+                    date_str = w['logged_at'][:10] if isinstance(w['logged_at'], str) else w['logged_at'].strftime('%Y-%m-%d')
+                    pdf.sub_title(f"{date_str} - {w['workout_type']}")
+                    pdf.simple_text(f"Duration: {w.get('duration_minutes', 0)} min | Burned: {w.get('calories_burned', 0)} kcal")
+                    if w.get('exercises'):
+                        pdf.simple_text(f"Exercises: {w['exercises']}")
+                    pdf.ln(3)
+            else:
+                pdf.simple_text("No workouts logged in the last 30 days.")
+                
+            # --- PAGE 5: INSIGHTS ---
+            pdf.add_page()
+            pdf.page_title('AI Fitness Insights')
+            pdf.section_title('COACH SUMMARY')
+            
+            # Clean AI response for PDF (replace fancy quotes, etc)
+            insight_clean = ai_insight.replace('"', '"').replace('"', '"').replace('\u2019', "'").replace('\u2014', "-")
+            pdf.simple_text(insight_clean)
+            pdf.ln(10)
+            
+            pdf.section_title('DATA COMPLETENESS')
+            pdf.key_value_row("Weight Logs:", f"{len(weight_30d)} entries")
+            pdf.key_value_row("Nutrition Logs:", f"{len(cals_30d)} entries")
+            pdf.key_value_row("Workout Logs:", f"{len(workouts_30d)} entries")
 
             pdf_bytes = bytes(pdf.output())
-            filename = f'fitai_report_{timestamp}.pdf'
+            timestamp = datetime.now().strftime('%Y%m%d')
+            filename = f'fitai_assessment_{username}_{timestamp}.pdf'
             
-            return Response(pdf_bytes, mimetype='application/pdf', headers={'Content-Disposition': f'attachment; filename={filename}'})
+            return Response(
+                pdf_bytes, 
+                mimetype='application/pdf', 
+                headers={'Content-Disposition': f'attachment; filename={filename}'}
+            )
             
         except ImportError:
             # Fallback to Text report if fpdf is not installed
-            text_report = f"""FITAI - FITNESS ANALYTICS REPORT
-Generated: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
---------------------------------------------------
-
-[ PROFILE ]
-Age: {profile.get('age', 'N/A')}
-Gender: {profile.get('gender', 'N/A')}
-Height: {profile.get('height', 'N/A')} cm
-Weight: {profile.get('weight', 'N/A')} kg
-Goal Weight: {profile.get('goal_weight', 'N/A')} kg
-Fitness Goal: {profile.get('fitness_goal', 'N/A')}
-Activity Level: {profile.get('activity_level', 'N/A')}
-
-[ FITNESS SCORE ]
-Overall Score: {fitness_score}/100
-Current Streak: {streak} days
-
-[ TODAY'S SUMMARY ]
-Calories: {today_summary.get('calories_consumed', 0)} kcal in / {today_summary.get('calories_burned', 0)} kcal out
-Water: {today_summary.get('water_ml', 0)} ml
-Sleep: {today_summary.get('sleep_hours', 0)} hrs
-Steps: {today_summary.get('steps', 0)}
-Workouts: {today_summary.get('workout_count', 0)}
-
-[ WEEKLY AVERAGES ]
-Avg Calories: {weekly_summary.get('avg_calories_consumed', 0)} in / {weekly_summary.get('avg_calories_burned', 0)} out
-Avg Water: {weekly_summary.get('avg_water', 0)} ml
-Avg Sleep: {weekly_summary.get('avg_sleep', 0)} hrs
-Workouts: {weekly_summary.get('workout_count', 0)}
-Avg Steps: {weekly_summary.get('avg_steps', 0)}
-
-[ HABIT CONSISTENCY (Last 30 Days) ]
-Water: {habits.get('water_consistency', 0)}%
-Sleep: {habits.get('sleep_consistency', 0)}%
-Workout: {habits.get('workout_consistency', 0)}%
-Calorie: {habits.get('calorie_consistency', 0)}%
-Overall: {habits.get('overall', 0)}%
-
-[ GOAL PREDICTION ]
-Predicted Achievement: {prediction.get('predicted_date', 'N/A')}
-On Track: {'Yes' if prediction.get('on_track') else 'No'}
-Days Remaining: {prediction.get('days_remaining', 'N/A')}
---------------------------------------------------
-"""
-            filename = f'fitai_report_{timestamp}.txt'
-            return Response(text_report, mimetype='text/plain', headers={'Content-Disposition': f'attachment; filename={filename}'})
+            import traceback
+            logger.error(f'FPDF Import Error: {traceback.format_exc()}')
+            return 'Error: fpdf2 is not installed. Please run `pip install fpdf2` to generate PDF reports.', 500
 
     except Exception as e:
         import traceback
