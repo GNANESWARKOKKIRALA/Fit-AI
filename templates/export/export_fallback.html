@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fitness Assessment Report - {{ username }}</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --text-main: #334155;
+            --text-light: #64748b;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+        }
+        .page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: #fff;
+            min-height: 1050px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        
+        @media print {
+            body { background: #fff; }
+            .page { 
+                margin: 0; 
+                box-shadow: none; 
+                page-break-after: always;
+            }
+            /* Hide print button on print */
+            .no-print { display: none !important; }
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 4px solid var(--accent);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: var(--primary);
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }
+        .header p {
+            color: var(--text-light);
+            margin: 0;
+        }
+        
+        .section-title {
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .data-row .label {
+            font-weight: 600;
+            color: var(--text-light);
+        }
+        .data-row .val {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .text-block {
+            line-height: 1.6;
+            color: var(--text-main);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            color: var(--text-light);
+            font-size: 12px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+        
+        .btn-print {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            background: var(--accent);
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+    </style>
+</head>
+<body onload="window.print()">
+
+    <div class="no-print" style="background:#fff; padding: 20px; text-align:center; border-bottom: 1px solid #ddd;">
+        <h2>Your PDF Report is Ready!</h2>
+        <p>Your browser's PDF engine will handle this. Click "Save as PDF" in the print dialog.</p>
+        <button class="btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+    </div>
+
+    <!-- PAGE 1: Overview -->
+    <div class="page">
+        <div class="header">
+            <h1>FitAI Assessment System</h1>
+            <p>Comprehensive Fitness & Bodybuilding Report</p>
+        </div>
+        
+        <p><strong>Client:</strong> {{ username.upper() }}</p>
+        <p><strong>Report Date:</strong> {{ now().strftime('%B %d, %Y') if now else '' }}</p>
+        
+        <div class="section-title">User Profile</div>
+        <div class="grid-2">
+            <div>
+                <div class="data-row"><span class="label">Age:</span> <span class="val">{{ profile.get('age', 'N/A') }}</span></div>
+                <div class="data-row"><span class="label">Gender:</span> <span class="val">{{ profile.get('gender', 'N/A') | title }}</span></div>
+                <div class="data-row"><span class="label">Activity Level:</span> <span class="val">{{ profile.get('activity_level', 'N/A') | title }}</span></div>
+            </div>
+            <div>
+                <div class="data-row"><span class="label">Height:</span> <span class="val">{{ profile.get('height') }} cm</span></div>
+                <div class="data-row"><span class="label">Weight:</span> <span class="val">{{ profile.get('weight') }} kg</span></div>
+                <div class="data-row"><span class="label">Goal Weight:</span> <span class="val">{{ profile.get('goal_weight', 'N/A') }} kg</span></div>
+            </div>
+        </div>
+        
+        <div class="section-title">Consistency & Habits</div>
+        <div class="data-row"><span class="label">Overall Score:</span> <span class="val">{{ fitness_score }}/100</span></div>
+        <div class="data-row"><span class="label">Current Streak:</span> <span class="val">{{ streak }} Days</span></div>
+        <div class="data-row"><span class="label">Workout Consistency:</span> <span class="val">{{ habits.get('workout_consistency', 0) }}%</span></div>
+        <div class="data-row"><span class="label">Nutrition Tracking:</span> <span class="val">{{ habits.get('calorie_consistency', 0) }}%</span></div>
+        <div class="data-row"><span class="label">Hydration Tracking:</span> <span class="val">{{ habits.get('water_consistency', 0) }}%</span></div>
+
+        <div class="section-title">Metric Calculations</div>
+        <div class="data-row"><span class="label">Body Mass Index (BMI):</span> <span class="val">{{ bmi }} ({{ bmi_cat }})</span></div>
+        <div class="data-row"><span class="label">Basal Metabolic Rate (BMR):</span> <span class="val">{{ bmr }} kcal/day</span></div>
+        <div class="data-row"><span class="label">Total Daily Energy Exp. (TDEE):</span> <span class="val">{{ tdee }} kcal/day</span></div>
+        <p style="font-size: 12px; color: var(--text-light); margin-top: 5px;">Note: BMR calculated using Mifflin-St Jeor equation.</p>
+        
+        <div class="footer">FitAI Generated Report - Page 1</div>
+    </div>
+    
+    <!-- PAGE 2: Performance -->
+    <div class="page">
+        <div class="header">
+            <h1>Body Composition & Performance</h1>
+            <p>Macros, Volume, and Coach Insights</p>
+        </div>
+        
+        <div class="section-title">Target Macronutrients</div>
+        {% if macros %}
+        <div class="data-row"><span class="label">Target Calories:</span> <span class="val">{{ macros.target_calories }} kcal/day</span></div>
+        <div class="data-row"><span class="label">Protein (2.2g/kg):</span> <span class="val">{{ macros.protein_g }}g</span></div>
+        <div class="data-row"><span class="label">Carbohydrates:</span> <span class="val">{{ macros.carb_g }}g</span></div>
+        <div class="data-row"><span class="label">Fats:</span> <span class="val">{{ macros.fat_g }}g</span></div>
+        <div class="data-row"><span class="label">Fiber:</span> <span class="val">{{ macros.fiber_g }}g</span></div>
+        {% else %}
+        <p>Missing profile data to calculate macros.</p>
+        {% endif %}
+        
+        <div class="section-title">30-Day Workout Summary</div>
+        <div class="data-row"><span class="label">Total Workouts Logged:</span> <span class="val">{{ workouts_30d|length }}</span></div>
+        <div class="data-row"><span class="label">Estimated Volume:</span> <span class="val">{{ "{:,.0f}".format(total_volume) }} kg</span></div>
+        
+        <div style="margin-top: 15px; padding-left: 20px;">
+        {% for wtype, count in workout_types.items() %}
+            <div class="data-row"><span class="label" style="font-weight:normal;">• {{ wtype }}:</span> <span class="val">{{ count }} sessions</span></div>
+        {% endfor %}
+        </div>
+        
+        <div class="section-title">AI Coach Insight</div>
+        <div class="text-block" style="background: #f1f5f9; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent);">
+            {{ ai_insight }}
+        </div>
+        
+        <div class="section-title">Data Completeness</div>
+        <div class="data-row"><span class="label">Weight Logs (30d):</span> <span class="val">{{ weight_30d|length }} entries</span></div>
+        <div class="data-row"><span class="label">Nutrition Logs (30d):</span> <span class="val">{{ cals_30d|length }} entries</span></div>
+        <div class="data-row"><span class="label">Workout Logs (30d):</span> <span class="val">{{ workouts_30d|length }} entries</span></div>
+
+        <div class="footer">FitAI Generated Report - Page 2</div>
+    </div>
+
+</body>
+</html>
