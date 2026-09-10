@@ -207,5 +207,46 @@
         <div class="footer">FitAI Generated Report - Page 2</div>
     </div>
 
+
+    <!-- PAGE 3+: Daily Logs Breakdown -->
+    <div class="page">
+        <div class="header">
+            <h1>Detailed Daily Logs</h1>
+            <p>Your complete 30-day tracking history</p>
+        </div>
+        
+        {% for date, data in daily_logs.items() %}
+        <div style="margin-bottom: 25px; border-left: 3px solid var(--accent); padding-left: 15px;">
+            <h3 style="color: var(--primary); margin: 0 0 10px 0;">{{ date }}</h3>
+            
+            {% if data.weight %}
+                <div class="data-row" style="padding: 4px 0;"><span class="label">Weight:</span> <span class="val">{{ data.weight }} kg</span></div>
+            {% endif %}
+            
+            {% if data.calories %}
+                <div class="data-row" style="padding: 4px 0;"><span class="label">Nutrition:</span> <span class="val">{{ data.calories.calories_consumed }} kcal consumed | {{ data.calories.calories_burned }} kcal burned</span></div>
+                {% if data.calories.meal_details %}
+                    <div style="font-size: 13px; color: var(--text-light); margin-top: 4px;">Meals: {{ data.calories.meal_details }}</div>
+                {% endif %}
+            {% endif %}
+            
+            {% if data.workouts %}
+                {% for w in data.workouts %}
+                    <div class="data-row" style="padding: 4px 0; margin-top: 5px;"><span class="label">Workout ({{ w.workout_type }}):</span> <span class="val">{{ w.duration_minutes }} min</span></div>
+                    {% if w.exercises %}
+                        <div style="font-size: 13px; color: var(--text-main); margin-top: 4px; background: #f8fafc; padding: 5px;">{{ w.exercises }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            
+        </div>
+        {% endfor %}
+        {% if not daily_logs %}
+            <p>No activity logged in the past 30 days.</p>
+        {% endif %}
+        
+        <div class="footer">FitAI Generated Report - Daily Logs</div>
+    </div>
+
 </body>
 </html>

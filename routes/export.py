@@ -331,10 +331,34 @@ def export_report():
             )
             
         except ImportError:
-            # Fallback to Text report if fpdf is not installed
-            import traceback
-            logger.error(f'FPDF Import Error: {traceback.format_exc()}')
-            return 'Error: fpdf2 is not installed. Please run `pip install fpdf2` to generate PDF reports.', 500
+            # Group logs by date
+            daily_logs = {}
+            for w in weight_30d:
+                d = str(w['logged_at'])[:10]
+                if d not in daily_logs: daily_logs[d] = {}
+                daily_logs[d]['weight'] = w['weight']
+            for w in workouts_30d:
+                d = str(w['logged_at'])[:10]
+                if d not in daily_logs: daily_logs[d] = {}
+                if 'workouts' not in daily_logs[d]: daily_logs[d]['workouts'] = []
+                daily_logs[d]['workouts'].append(w)
+            for cal in cals_30d:
+                d = str(cal['logged_at'])[:10]
+                if d not in daily_logs: daily_logs[d] = {}
+                daily_logs[d]['calories'] = cal
+            sorted_logs = dict(sorted(daily_logs.items(), reverse=True))
+
+            logger.warning('fpdf2 not installed. Falling back to HTML print report.')
+            return render_template('export/export_fallback.html',
+                username=username, profile=profile,
+                fitness_score=fitness_score, streak=streak, habits=habits,
+                bmi=bmi, bmi_cat=bmi_cat, bmr=bmr, tdee=tdee,
+                weight_30d=weight_30d, prediction=prediction,
+                macros=macros, weekly_summary=weekly_summary,
+                workouts_30d=workouts_30d, total_volume=total_volume,
+                workout_types=workout_types, ai_insight=ai_insight,
+                cals_30d=cals_30d, daily_logs=sorted_logs, now=datetime.now
+            )
 
     except Exception as e:
         import traceback
