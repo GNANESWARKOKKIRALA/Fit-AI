@@ -28,19 +28,43 @@ class AIEngine:
     # ------------------------------------------------------------------
 
     def _call_api(self, messages, temperature=0.7, max_tokens=2048):
-        """Call Groq API with automatic dynamic model fallback."""
+        """Call Groq API with dynamic model discovery."""
         if not self.client:
             return 'AI features require a valid GROQ_API_KEY in .env file.'
 
+        # Words that indicate a model is NOT a chat completion model
+        EXCLUDED = {'guard', 'whisper', 'distil', 'tool-use', 'embed', 'moderation', 'classify'}
+
         try:
-            # Dynamically fetch ONLY models your specific API key has access to!
-            available_models = [m.id for m in self.client.models.list().data]
-            # Prioritize Llama 3 models
-            models_to_try = sorted([m for m in available_models if 'llama' in m.lower() or 'mixtral' in m.lower()], reverse=True)
+            all_models = [m.id for m in self.client.models.list().data]
+            # Filter to only chat-capable models (exclude guard, whisper, embeddings, etc.)
+            chat_models = [
+                m for m in all_models
+                if not any(ex in m.lower() for ex in EXCLUDED)
+            ]
+            # Prefer larger models first (70b > 8b), llama > mixtral > gemma
+            def model_priority(name):
+                n = name.lower()
+                score = 0
+                if '70b' in n: score += 100
+                elif '90b' in n: score += 90
+                elif '27b' in n: score += 80
+                elif '9b' in n: score += 70
+                elif '8b' in n: score += 60
+                elif '7b' in n: score += 50
+                elif '3b' in n: score += 30
+                if 'llama-3.3' in n: score += 1000
+                elif 'llama-3.1' in n: score += 900
+                elif 'llama' in n: score += 800
+                elif 'mixtral' in n: score += 700
+                elif 'gemma' in n: score += 600
+                return score
+
+            models_to_try = sorted(chat_models, key=model_priority, reverse=True)
             if not models_to_try:
-                models_to_try = ['llama-3.1-8b-instant']
+                models_to_try = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
         except Exception:
-            models_to_try = ['llama-3.1-8b-instant', 'mixtral-8x7b-32768']
+            models_to_try = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant']
 
         last_error = ""
 
@@ -60,16 +84,16 @@ class AIEngine:
                 except Exception as e:
                     last_error = str(e)
                     err_lower = last_error.lower()
-                    
+
                     if 'rate_limit' in err_lower or '429' in err_lower:
                         import time
                         time.sleep(2 ** attempt)
                         continue
-                    
-                    # Break to next model
+
+                    # Any other error: skip to next model
                     break
 
-        return f'AI service failed after trying {len(models_to_try)} authorized models. Last error: {last_error}'
+        return f'AI service failed after trying {len(models_to_try)} chat models. Models tried: {models_to_try}. Last error: {last_error}'
 
     @staticmethod
     def _profile_summary(profile: dict) -> str:
