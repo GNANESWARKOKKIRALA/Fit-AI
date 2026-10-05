@@ -48,7 +48,7 @@ class AIEngine:
                     time.sleep(2 ** attempt)
                     continue
                 logger.error(f'Groq API error: {e}')
-                return 'AI service temporarily unavailable. Please try again.'
+                return f'AI service temporarily unavailable. Please try again. (Debug: {str(e)})'
 
         return 'AI service is busy. Please try again in a moment.'
 
