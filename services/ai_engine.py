@@ -28,18 +28,19 @@ class AIEngine:
     # ------------------------------------------------------------------
 
     def _call_api(self, messages, temperature=0.7, max_tokens=2048):
-        """Call Groq API with automatic model fallback."""
+        """Call Groq API with automatic dynamic model fallback."""
         if not self.client:
             return 'AI features require a valid GROQ_API_KEY in .env file.'
 
-        models_to_try = [
-            'llama-3.3-70b-versatile',
-            'llama-3.1-70b-versatile',
-            'llama-3.1-8b-instant',
-            'mixtral-8x7b-32768',
-            'gemma2-9b-it',
-            'llama-3.2-3b-preview'
-        ]
+        try:
+            # Dynamically fetch ONLY models your specific API key has access to!
+            available_models = [m.id for m in self.client.models.list().data]
+            # Prioritize Llama 3 models
+            models_to_try = sorted([m for m in available_models if 'llama' in m.lower() or 'mixtral' in m.lower()], reverse=True)
+            if not models_to_try:
+                models_to_try = ['llama-3.1-8b-instant']
+        except Exception:
+            models_to_try = ['llama-3.1-8b-instant', 'mixtral-8x7b-32768']
 
         last_error = ""
 
@@ -54,7 +55,7 @@ class AIEngine:
                     content = response.choices[0].message.content
                     if content:
                         content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
-                    self.model = model_id  # Save successful model for next time
+                    self.model = model_id
                     return content
                 except Exception as e:
                     last_error = str(e)
@@ -65,14 +66,10 @@ class AIEngine:
                         time.sleep(2 ** attempt)
                         continue
                     
-                    # For ANY other error (model not found, decommissioned, access denied, etc.)
-                    # Log it and immediately break out to try the next model in the list
-                    import logging
-                    logging.warning(f"Groq model {model_id} failed: {last_error}")
+                    # Break to next model
                     break
 
-        return f'AI service failed after trying all fallback models. Last error: {last_error}'
-
+        return f'AI service failed after trying {len(models_to_try)} authorized models. Last error: {last_error}'
 
     @staticmethod
     def _profile_summary(profile: dict) -> str:
