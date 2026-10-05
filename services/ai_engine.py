@@ -21,7 +21,7 @@ class AIEngine:
     def __init__(self):
         api_key = os.environ.get('GROQ_API_KEY')
         self.client = Groq(api_key=api_key) if api_key else None
-        self.model = 'openai/gpt-oss-120b'
+        self.model = 'llama-3.3-70b-versatile'
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -120,9 +120,11 @@ class AIEngine:
     ) -> str:
         """Generate a full-day meal plan with macro breakdown."""
         system_prompt = (
-            "You are a certified nutritionist and registered dietitian with "
-            "expertise in sports nutrition and body composition. Create "
-            "detailed, practical meal plans personalised to the client.\n\n"
+            "You are an elite, evidence-based registered dietitian and sports nutritionist. "
+            "Provide highly accurate, practical, and highly specific meal plans. "
+            "Never use generic advice. Always provide EXACT serving sizes in grams or cups, "
+            "EXACT macronutrient breakdowns (Protein/Carb/Fat) for every single meal, and "
+            "ensure the total matches the target calories perfectly.\n\n"
             f"{self._profile_summary(profile)}"
         )
         user_prompt = (
@@ -130,26 +132,24 @@ class AIEngine:
             f"{target_calories} calories per day.\n\n"
             "Format the plan in structured markdown with these sections:\n\n"
             "## Daily Macro Targets\n"
-            "- Protein, Carbs, Fat in grams and percentages\n\n"
+            "- Exact Protein, Carbs, Fat in grams\n\n"
             "## Breakfast (~X cal)\n"
-            "- Food items with portions\n"
-            "- Macros: P/C/F\n\n"
+            "- Exact food items with precise measurements (e.g. 150g greek yogurt)\n"
+            "- Macros for this meal: Xg Protein | Xg Carbs | Xg Fat\n\n"
             "## Morning Snack (~X cal)\n"
-            "- Food items with portions\n"
+            "- Exact food items with precise measurements\n"
             "- Macros: P/C/F\n\n"
             "## Lunch (~X cal)\n"
-            "- Food items with portions\n"
+            "- Exact food items with precise measurements\n"
             "- Macros: P/C/F\n\n"
             "## Afternoon Snack (~X cal)\n"
-            "- Food items with portions\n"
+            "- Exact food items with precise measurements\n"
             "- Macros: P/C/F\n\n"
             "## Dinner (~X cal)\n"
-            "- Food items with portions\n"
+            "- Exact food items with precise measurements\n"
             "- Macros: P/C/F\n\n"
-            "## Daily Totals\n"
-            "- Total calories and macro summary\n"
-            "- Hydration recommendation\n"
-            "- Supplement suggestions if appropriate"
+            "## Grocery List\n"
+            "- A quick summary of items to buy"
         )
         messages = [
             {'role': 'system', 'content': system_prompt},
@@ -246,11 +246,13 @@ class AIEngine:
     ) -> str:
         """Conversational fitness assistant with context memory."""
         system_prompt = (
-            "You are FitAI, a friendly and knowledgeable AI fitness "
-            "assistant. You help users with workout advice, nutrition "
-            "guidance, motivation, and general fitness questions. Keep "
-            "responses helpful, concise, and encouraging. Use the user's "
-            "profile to personalise your answers.\n\n"
+            "You are FitAI, an elite, evidence-based fitness and nutrition coach. "
+            "Your knowledge is based on peer-reviewed sports science, biomechanics, and clinical nutrition. "
+            "When the user asks a question, provide highly accurate, actionable, and specific advice. "
+            "Do NOT use generic platitudes like 'listen to your body' or 'eat healthy'. "
+            "Give exact rep ranges, specific exercises, precise macro targets, or scientific explanations. "
+            "Keep your tone professional, direct, and encouraging. "
+            "Always tailor your advice strictly to the user's profile.\n\n"
             f"{self._profile_summary(profile)}"
         )
 
