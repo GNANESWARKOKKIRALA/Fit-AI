@@ -58,19 +58,20 @@ class AIEngine:
                 except Exception as e:
                     last_error = str(e)
                     err_lower = last_error.lower()
-                    if 'does not exist' in err_lower or 'model_not_found' in err_lower or 'access to it' in err_lower:
-                        # Break attempt loop, try next model
-                        break
+                    
                     if 'rate_limit' in err_lower or '429' in err_lower:
                         import time
                         time.sleep(2 ** attempt)
                         continue
                     
+                    # For ANY other error (model not found, decommissioned, access denied, etc.)
+                    # Log it and immediately break out to try the next model in the list
                     import logging
-                    logging.error(f'Groq API error on {model_id}: {e}')
-                    return f'AI service temporarily unavailable. Please try again. (Debug: {e})'
+                    logging.warning(f"Groq model {model_id} failed: {last_error}")
+                    break
 
-        return f'AI service failed. You may not have access to any Llama 3 models on your Groq API key. Last error: {last_error}'
+        return f'AI service failed after trying all fallback models. Last error: {last_error}'
+
 
     @staticmethod
     def _profile_summary(profile: dict) -> str:
