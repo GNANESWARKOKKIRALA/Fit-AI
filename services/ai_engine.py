@@ -28,29 +28,49 @@ class AIEngine:
     # ------------------------------------------------------------------
 
     def _call_api(self, messages, temperature=0.7, max_tokens=2048):
-        """Call Groq API with exponential-backoff retry logic."""
+        """Call Groq API with automatic model fallback."""
         if not self.client:
             return 'AI features require a valid GROQ_API_KEY in .env file.'
 
-        for attempt in range(3):
-            try:
-                response = self.client.chat.completions.create(
-                    messages=messages,
-                    model=self.model,
-                    temperature=temperature
-                )
-                content = response.choices[0].message.content
-                if content:
-                    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
-                return content
-            except Exception as e:
-                if 'rate_limit' in str(e).lower() or '429' in str(e):
-                    time.sleep(2 ** attempt)
-                    continue
-                logger.error(f'Groq API error: {e}')
-                return f'AI service temporarily unavailable. Please try again. (Debug: {str(e)})'
+        models_to_try = [
+            'llama-3.3-70b-versatile',
+            'llama-3.3-70b-specdec',
+            'llama-3.1-70b-versatile',
+            'llama3-70b-8192',
+            'llama3-8b-8192'
+        ]
 
-        return 'AI service is busy. Please try again in a moment.'
+        last_error = ""
+
+        for model_id in models_to_try:
+            for attempt in range(2):
+                try:
+                    response = self.client.chat.completions.create(
+                        messages=messages,
+                        model=model_id,
+                        temperature=temperature
+                    )
+                    content = response.choices[0].message.content
+                    if content:
+                        content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+                    self.model = model_id  # Save successful model for next time
+                    return content
+                except Exception as e:
+                    last_error = str(e)
+                    err_lower = last_error.lower()
+                    if 'does not exist' in err_lower or 'model_not_found' in err_lower or 'access to it' in err_lower:
+                        # Break attempt loop, try next model
+                        break
+                    if 'rate_limit' in err_lower or '429' in err_lower:
+                        import time
+                        time.sleep(2 ** attempt)
+                        continue
+                    
+                    import logging
+                    logging.error(f'Groq API error on {model_id}: {e}')
+                    return f'AI service temporarily unavailable. Please try again. (Debug: {e})'
+
+        return f'AI service failed. You may not have access to any Llama 3 models on your Groq API key. Last error: {last_error}'
 
     @staticmethod
     def _profile_summary(profile: dict) -> str:
